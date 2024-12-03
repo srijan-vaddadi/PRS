@@ -80,6 +80,31 @@ namespace PRS.Repository
             }
         }
 
+        public void UpdateUser(User user, string connectionString)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
+                string spname = "Sp_UpdateUser";
+                using (SqlCommand command = new SqlCommand(spname, connection))
+                {
+                    command.Parameters.AddWithValue("@UserName", user.Username);
+                    command.Parameters.AddWithValue("@Password", user.Password);
+                  //  command.Parameters.AddWithValue("@Active", 1);
+                    command.Parameters.AddWithValue("@UserType", user.UserTypeId);
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = spname;
+
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
+                }
+            }
+        }
+
         public void ChangeUserPassword(User user, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -96,23 +121,71 @@ namespace PRS.Repository
                     command.CommandText = spname;
 
 
+                   command.ExecuteNonQuery();
+
+                   // Console.WriteLine($"{rowsAffected} row(s) Updated.");
+                }
+            }
+        }
+        public void EnableuserAccount(string username, string connectionString)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
+                string spname = "Sp_EnableuserAccount";
+                using (SqlCommand command = new SqlCommand(spname, connection))
+                {
+                    command.Parameters.AddWithValue("@UserName",username);
+                 //   command.Parameters.AddWithValue("@Active", 1);
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = spname;
+
+
                     int rowsAffected = command.ExecuteNonQuery();
 
                     Console.WriteLine($"{rowsAffected} row(s) inserted.");
                 }
             }
         }
-        public void EnableOrDisableAccount(User user, string connectionString)
+
+        public void DisableuserAccount(string username, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_EnableOrDisableAccount";
+                string spname = "Sp_DisableuserAccount";
                 using (SqlCommand command = new SqlCommand(spname, connection))
                 {
-                    command.Parameters.AddWithValue("@UserName", user.Username);
-                    command.Parameters.AddWithValue("@Active", user.Active);
+                    command.Parameters.AddWithValue("@UserName", username);
+                    //   command.Parameters.AddWithValue("@Active", 1);
+
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = spname;
+
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
+                }
+            }
+        }
+
+        public void UpdateUserType(User usr, string connectionString)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
+                string spname = "Sp_UpdateUserType";
+                using (SqlCommand command = new SqlCommand(spname, connection))
+                {
+                    command.Parameters.AddWithValue("@UserName", usr.Username);
+                    command.Parameters.AddWithValue("@UserType", usr.UserTypeId);
+
+                    //   command.Parameters.AddWithValue("@Active", 1);
 
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = spname;

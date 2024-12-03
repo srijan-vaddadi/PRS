@@ -12,11 +12,11 @@ namespace PRS
             //public Admin(string username, string password)
             //    : base(username, password, UserType.Admin) { }
 
-        public override void DisplayFeatures(string connectionstring, UserType UserTypeId)
+        public override void DisplayFeatures(string connectionstring, User user)
         {
             Console.WriteLine("Please select one of the below options");
             UserRepository usr=new UserRepository();
-           List<Feature> features= usr.FetchUserFeatures(connectionstring, UserTypeId);
+           List<Feature> features= usr.FetchUserFeatures(connectionstring, user.UserTypeId);
             foreach (Feature feature in features)
             {
                 Console.WriteLine(feature.FeatureId +". " +feature.FeatureName);
@@ -24,7 +24,7 @@ namespace PRS
             int featureid = Convert.ToInt32(Console.ReadLine());
             Feature featurename= features.Find(f => f.FeatureId == featureid);
             Feature onjFeature = new Feature();
-            onjFeature.ExecuteFeature(featurename.FeatureName);
+            onjFeature.ExecuteFeature(featurename.FeatureName, user);
             //Console.WriteLine("1. Add User");
             //Console.WriteLine("2. View Users");
         }

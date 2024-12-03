@@ -8,7 +8,7 @@ namespace PRS
 {
     public class Nurse : Users
     {
-        public override void DisplayFeatures(string connectionstring, UserType UserTypeId)
+        public override void DisplayFeatures(string connectionstring, User usr)
         {
             Console.WriteLine("Nurse Features:");
             Console.WriteLine("1. Add User");

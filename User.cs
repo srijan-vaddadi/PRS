@@ -8,12 +8,9 @@ namespace PRS
 {
     public abstract class Users
     {     
-        public abstract void DisplayFeatures(string connectionstring, UserType UserTypeId);
+        public abstract void DisplayFeatures(string connectionstring, User usr);
 
-        public void Logout()
-        {
-            Console.WriteLine("LoggedOut Successfully");
-        }
+        
     }
     public class User
     {

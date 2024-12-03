@@ -55,7 +55,7 @@
                         {
                             case UserType.Admin:
                                 Users adm = new Admin();
-                                adm.DisplayFeatures(connectionString,UserType.Admin);
+                                adm.DisplayFeatures(connectionString, usr1);
                                 break;
                             //case UserType.Doctor:
                             //    newUser = new Doctor(username, password);
