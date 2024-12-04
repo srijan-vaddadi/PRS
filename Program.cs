@@ -27,7 +27,7 @@
             string connectionString = "Server=PRECISION-SRIJ\\SQLEXPRESS;Database=PRS;Trusted_Connection=True;";
             List<User> users = new List<User>();
             UserRepository userRepository = new UserRepository();
-            users = userRepository.FetchAllUsers(connectionString);
+            users = userRepository.FetchAllUsers();
             if (users != null)
             {
                 Console.WriteLine("Enter Username:");
@@ -51,9 +51,9 @@
                     }
                     else
                     {
-                        switch (usr1.UserTypeId)
+                        switch (usr1.UserType)
                         {
-                            case UserType.Admin:
+                            case "Admin":
                                 Users adm = new Admin();
                                 adm.DisplayFeatures(connectionString, usr1);
                                 break;

@@ -16,6 +16,7 @@ namespace PRS
         {
             //var selectedFeature = user.AllowedFeatures.Find(f => f.FeatureId == selectedFeatureId);
             string connectionString = "Server=PRECISION-SRIJ\\SQLEXPRESS;Database=PRS;Trusted_Connection=True;";
+            var filePath = @"C:\Users\srija\Srijan\Project\PRS\Data\users.csv";
             try
             {
                 if (selectedFeature != null)
@@ -27,7 +28,7 @@ namespace PRS
                              Console.ReadLine();
                             break;
                         case "FetchAllUsers":
-                            FetchAllUsers(connectionString);
+                            FetchAllUsers();
                             Console.ReadLine();
                             break;
                         case "AddUser":
@@ -36,22 +37,22 @@ namespace PRS
                             Console.ReadLine();
                             break;
                         case "ChangePassword":
-                            ChangePassword(connectionString);
+                            ChangePassword(filePath);
                             Console.WriteLine("Password Changed Successfully");
                             Console.ReadLine();
                             break;
                         case "EnableUser":
-                            EnableUser(connectionString);
+                            EnableUser(filePath);
                             Console.WriteLine("User Enabled Successfully");
                             Console.ReadLine();
                             break;
                         case "DisableUser":
-                            DisableUser(connectionString, user);
+                            DisableUser(filePath, user);
                             Console.WriteLine("User Disabled Successfully");
                             Console.ReadLine();
                             break;
                         case "UpdateUserType":
-                            UpdateUserType(connectionString);
+                            UpdateUserType(filePath);
                             Console.WriteLine("UserType Updated Successfully");
                             Console.ReadLine();
                             break;
@@ -75,20 +76,20 @@ namespace PRS
         {
             Console.WriteLine("LoggedOut Successfully");
         }
-        public void FetchAllUsers(string connectionString)
+        public void FetchAllUsers()
         {
             UserRepository userrepo = new UserRepository();
            
-            List<User> users = userrepo.FetchAllUsers(connectionString);
+            List<User> users = userrepo.FetchAllUsers();
             Console.WriteLine("Following is the Users List");
             Console.WriteLine();
             Console.WriteLine("-------------------------------------------------------");
-            Console.WriteLine("UserName "+"        |         "+ " Enabled ");
+            Console.WriteLine("UserName "+"        |         "+ " Enabled " +"       |         "+"UserType");
             Console.WriteLine("-------------------------------------------------------");
             foreach (User user in users)
             {
                 Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(user.Username + "           |            " + user.Active);
+                Console.WriteLine(user.Username + "           |            " + user.Active+"       |         "+user.UserType);
                 Console.WriteLine("-------------------------------------------------------");
             }
         }
@@ -99,7 +100,7 @@ namespace PRS
             User usr = new User();
             Console.WriteLine("Enter UserName");
             usr.Username = Console.ReadLine();
-            List<User> users = userrepo.FetchAllUsers(connectionString);
+            List<User> users = userrepo.FetchAllUsers();
             if (users.Find(u => u.Username == usr.Username) == null)
             {
 
@@ -114,21 +115,21 @@ namespace PRS
                 switch(userType)
                 {
                     case "1":
-                        usr.UserTypeId = UserType.Admin;
+                        usr.UserType = "Admin";
                         break;
                         
                     case "2":
-                        usr.UserTypeId = UserType.Doctor;
+                        usr.UserType = "Doctor";
                         break;
                     case "3":
-                        usr.UserTypeId = UserType.Nurse;
+                        usr.UserType = "Nurse";
                         break;
 
                 }
-
+                usr.Active = true;
                 try
                 {
-                    userrepo.SaveUser(usr, connectionString);
+                    userrepo.SaveUser(usr);
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message);}
             }
@@ -145,7 +146,7 @@ namespace PRS
             User usr = new User();
             Console.WriteLine("Enter UserName");
             usr.Username = Console.ReadLine();
-            List<User> users = userrepo.FetchAllUsers(connectionString);
+            List<User> users = userrepo.FetchAllUsers();
             if (users.Find(u => u.Username == usr.Username) != null)
             {
 
@@ -160,14 +161,14 @@ namespace PRS
                 switch (userType)
                 {
                     case "1":
-                        usr.UserTypeId = UserType.Admin;
+                        usr.UserType = "Admin";
                         break;
 
                     case "2":
-                        usr.UserTypeId = UserType.Doctor;
+                        usr.UserType = "Doctor";
                         break;
                     case "3":
-                        usr.UserTypeId = UserType.Nurse;
+                        usr.UserType = "Nurse";
                         break;
 
                 }
@@ -183,20 +184,21 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " doesn't  exist");
             }
         }
-        public void ChangePassword(string connectionstring)
+        public void ChangePassword(string filepath)
         {
             UserRepository userrepo = new UserRepository();
-            User usr = new User();
+           // User usr = new User();
             Console.WriteLine("Enter UserName");
-            usr.Username = Console.ReadLine();
-            List<User> users = userrepo.FetchAllUsers(connectionstring);
-            if (users.Find(u => u.Username == usr.Username) != null)
+            string Username = Console.ReadLine();
+            List<User> users = userrepo.FetchAllUsers();
+            User usr = users.Find(u => u.Username == Username);
+            if (usr != null)
             {
                 Console.WriteLine("Enter new Password");
                 usr.Password = Console.ReadLine();
                 try
                 {
-                    userrepo.ChangeUserPassword(usr, connectionstring);
+                    userrepo.WriteUsersToCsv(filepath, users);
                 }
                 catch (Exception ex)
                 {
@@ -208,20 +210,22 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " doesn't exist.");
             }
         }
-        public void EnableUser(string connectionstring)
+        public void EnableUser(string filepath)
         {
-            UserRepository userrepo = new UserRepository();
-          //  User usr = new User();
+            // User usr = new User();
+            UserRepository userrepo=new UserRepository();   
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
-            List<User> users = userrepo.FetchAllUsers(connectionstring);
-            User usrfound = users.FirstOrDefault(u => u.Username == Username);
-            if (usrfound != null)
+            List<User> users = userrepo.FetchAllUsers();
+            User usr = users.Find(u => u.Username == Username);
+            if (usr != null)
             {
-               
+
                 try
                 {
-                    userrepo.EnableuserAccount(Username, connectionstring);
+                    usr.Active = true;
+                    //userrepo.EnableuserAccount(Username, connectionstring);
+                    userrepo.WriteUsersToCsv(filepath, users);
                 }
                 catch (Exception ex)
                 {
@@ -233,7 +237,7 @@ namespace PRS
                 Console.WriteLine("User " + Username + " doesn't exist.");
             }
         }
-        public void DisableUser(string connectionstring, User user)
+        public void DisableUser(string filepath, User user)
         {
             UserRepository userrepo = new UserRepository();
             //  User usr = new User();
@@ -241,14 +245,16 @@ namespace PRS
             string Username = Console.ReadLine();
             if (Username != user.Username)
             {
-                List<User> users = userrepo.FetchAllUsers(connectionstring);
+                List<User> users = userrepo.FetchAllUsers();
                 User usrfound = users.FirstOrDefault(u => u.Username == Username);
                 if (usrfound != null)
                 {
 
                     try
                     {
-                        userrepo.DisableuserAccount(Username, connectionstring);
+                        usrfound.Active = true;
+                        //userrepo.EnableuserAccount(Username, connectionstring);
+                        userrepo.WriteUsersToCsv(filepath, users);
                     }
                     catch (Exception ex)
                     {
@@ -265,20 +271,20 @@ namespace PRS
                 Console.WriteLine("User Can't disable his own account");
             }
         }
-        public void UpdateUserType(string connectionstring)
+        public void UpdateUserType(string filepath)
         {
             UserRepository userrepo = new UserRepository();
-              User usr = new User();
+              //User usr = new User();
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
-            List<User> users = userrepo.FetchAllUsers(connectionstring);
+            List<User> users = userrepo.FetchAllUsers();
             User usrfound = users.FirstOrDefault(u => u.Username == Username);
             if (usrfound != null)
             {
 
                 try
                 {
-                    usr.Username = Username;
+                   // usr.Username = Username;
                     Console.WriteLine("Select UserType");
                     Console.WriteLine("1. Admin");
                     Console.WriteLine("2. Doctor");
@@ -287,19 +293,19 @@ namespace PRS
                     switch (userType)
                     {
                         case "1":
-                            usr.UserTypeId = UserType.Admin;
+                            usrfound.UserType = "Admin";
                             break;
 
                         case "2":
-                            usr.UserTypeId = UserType.Doctor;
+                            usrfound.UserType = "Doctor";
                             break;
                         case "3":
-                            usr.UserTypeId = UserType.Nurse;
+                            usrfound.UserType = "Nurse";
                             break;
 
                     }
-
-                    userrepo.UpdateUserType(usr, connectionstring);
+                    userrepo.WriteUsersToCsv(filepath, users);
+                    // userrepo.UpdateUserType(usr, connectionstring);
                 }
                 catch (Exception ex)
                 {

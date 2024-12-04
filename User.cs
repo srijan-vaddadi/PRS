@@ -14,10 +14,10 @@ namespace PRS
     }
     public class User
     {
-        public int UserID { get; set; }
+      //  public int UserID { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public UserType UserTypeId { get; set; }
+        public string UserType { get; set; }
         public bool Active { get; set; }
 
     }

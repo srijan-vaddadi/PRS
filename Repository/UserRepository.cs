@@ -1,86 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using CsvHelper;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using System.Globalization;
 
 namespace PRS.Repository
 {
     public class UserRepository
     {
-        public List<User> FetchAllUsers(string connectionString)
-        {
-            List<User> users = new List<User>();
+      
 
-            User user;
-            try
+        public List<User> FetchAllUsers()
+        {
+            var filePath = @"C:\Users\srija\Srijan\Project\PRS\Data\users.csv";
+
+
+            var users = new List<User>();
+
+
+            if (File.Exists(filePath))
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                var lines = File.ReadAllLines(filePath);
+
+
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    connection.Open();
-                    string spname = "Sp_FetchAllUsers";
-                    using (SqlCommand command = new SqlCommand(spname, connection))
+                    var values = lines[i].Split(',');
+
+                    var user = new User
                     {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = spname;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                user = new User();
-                                user.UserID = reader.GetInt32(0);
-                                user.Username = reader.GetString(1);
-                                user.UserTypeId = (UserType)reader["UserTypeId"];
-                                user.Active = (bool)reader["Active"];
-                                user.Password = reader["Password"].ToString();
-                                users.Add(user);
-                            }
-                        }
-                    }
+                        Username = values[0],
+                        Password = values[1],
+                        UserType =values[2],
+                        Active = Convert.ToBoolean(values[3])
+                       
+
+                    };
+
+                    users.Add(user);
                 }
 
-                // Output the users or process them as needed
-                //foreach (var user1 in users)
-                //{
-                //    Console.WriteLine($"Id: {user1.UserID}, Name: {user1.UserName}, IsActive: {user1.IsActive},UserTypeID: {user1.UserTypeID}");
-                //}
+
 
             }
-            catch (Exception ex)
+            else
             {
-                throw;
+                Console.WriteLine("CSV file not found.");
             }
-            //Console.ReadLine();
             return users;
         }
-        public void SaveUser(User user, string connectionString)
+        
+        public void SaveUser(User user)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            var filePath = @"C:\Users\srija\Srijan\Project\PRS\Data\users.csv";
+            var users = FetchAllUsers();
+
+            users.Add(user);
+
+            // Writing to CSV using CsvHelper
+            using (var writer = new StreamWriter(filePath))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_InsertUser";
-                using (SqlCommand command = new SqlCommand(spname, connection))
-                {
-                    command.Parameters.AddWithValue("@UserName", user.Username);
-                    command.Parameters.AddWithValue("@Password", user.Password);
-                    command.Parameters.AddWithValue("@Active", 1);
-                    command.Parameters.AddWithValue("@UserType", user.UserTypeId);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = spname;
-
-
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
-                }
+                WriteUsersToCsv(filePath, users);
             }
-        }
-
-        public void UpdateUser(User user, string connectionString)
+          }
+            public void UpdateUser(User user, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -92,8 +80,8 @@ namespace PRS.Repository
                     command.Parameters.AddWithValue("@UserName", user.Username);
                     command.Parameters.AddWithValue("@Password", user.Password);
                   //  command.Parameters.AddWithValue("@Active", 1);
-                    command.Parameters.AddWithValue("@UserType", user.UserTypeId);
-
+                 //   command.Parameters.AddWithValue("@UserType", );
+//
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = spname;
 
@@ -105,6 +93,12 @@ namespace PRS.Repository
             }
         }
 
+        public void WriteUsersToCsv(string filePath, List<User> users) 
+        { using (StreamWriter writer = new StreamWriter(filePath)) 
+            { foreach (var user in users) 
+                { writer.WriteLine($"{user.Username},{user.Password},{user.UserType},{user.Active}");}
+            } 
+        }
         public void ChangeUserPassword(User user, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -183,8 +177,8 @@ namespace PRS.Repository
                 using (SqlCommand command = new SqlCommand(spname, connection))
                 {
                     command.Parameters.AddWithValue("@UserName", usr.Username);
-                    command.Parameters.AddWithValue("@UserType", usr.UserTypeId);
-
+                   // command.Parameters.AddWithValue("@UserType", usr.UserTypeId);
+//
                     //   command.Parameters.AddWithValue("@Active", 1);
 
                     command.CommandType = CommandType.StoredProcedure;
@@ -197,7 +191,7 @@ namespace PRS.Repository
                 }
             }
         }
-        public List<Feature> FetchUserFeatures(string connectionString, UserType UserTypeId)
+        public List<Feature> FetchUserFeatures(string connectionString, string UserTypeId)
         {
             List<Feature> features = new List<Feature>();
 
@@ -212,7 +206,7 @@ namespace PRS.Repository
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.CommandText = spname;
-                        command.Parameters.Add("@UserTypeId", SqlDbType.Int).Value=(int)UserTypeId;
+                        command.Parameters.Add("@UserTypeId", SqlDbType.Int).Value = 1;
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())

@@ -16,7 +16,7 @@ namespace PRS
         {
             Console.WriteLine("Please select one of the below options");
             UserRepository usr=new UserRepository();
-           List<Feature> features= usr.FetchUserFeatures(connectionstring, user.UserTypeId);
+           List<Feature> features= usr.FetchUserFeatures(connectionstring, "1");
             foreach (Feature feature in features)
             {
                 Console.WriteLine(feature.FeatureId +". " +feature.FeatureName);
