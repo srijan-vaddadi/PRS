@@ -8,12 +8,10 @@ namespace PRS
 {
     public class Appointment
     {
-        public int AppointmentId { get; set; }
-        public int UserID { get; set; }
-        public int PatientID { get; set; }
-        public DateOnly AppointmentDate { get; set; }
-        public TimeOnly AppointmentTime { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public Boolean Active { get; set; }
+        public string HospitalNumber { get; set; }
+        public string AppointmentDate { get; set; }
+        public string AppointmentTime { get; set; }
+        public string DoctorName { get; set; }
+        public bool Active { get; set; }
     }
 }

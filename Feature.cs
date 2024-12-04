@@ -1,6 +1,7 @@
 ﻿using PRS.Repository;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,17 +12,14 @@ namespace PRS
     {
         public int FeatureId { get; set; }
         public string FeatureName { get; set; }
-        public Feature(int id,string name)
+        public Feature(int id, string name)
         {
             FeatureId = id;
             FeatureName = name;
         }
         public Feature() { }
-        public void ExecuteFeature(string  selectedFeature,User user,string filePath,string patientFilepath)
+        public void ExecuteFeature(string selectedFeature, User user, string filePath, string patientFilepath)
         {
-            //var selectedFeature = user.AllowedFeatures.Find(f => f.FeatureId == selectedFeatureId);
-           // string connectionString = "Server=PRECISION-SRIJ\\SQLEXPRESS;Database=PRS;Trusted_Connection=True;";
-            
             try
             {
                 if (selectedFeature != null)
@@ -30,7 +28,7 @@ namespace PRS
                     {
                         case "Logout":
                             Logout();
-                             Console.ReadLine();
+                            Console.ReadLine();
                             break;
                         case "FetchAllUsers":
                             FetchAllUsers(filePath);
@@ -68,7 +66,17 @@ namespace PRS
                             break;
                         case "FetchAllPatients":
                             FetchAllPatients(patientFilepath);
-                           // Console.WriteLine("Patient  Created Successfully");
+                            // Console.WriteLine("Patient  Created Successfully");
+                            Console.ReadLine();
+                            break;
+                        case "SearchPatient":
+                            SearchPatient(patientFilepath);
+                            // Console.WriteLine("Patient  Created Successfully");
+                            Console.ReadLine();
+                            break;
+                        case "AddAppointment":
+                            AddAppointment();
+                            Console.WriteLine("Appointment  Added Successfully");
                             Console.ReadLine();
                             break;
                         default:
@@ -81,7 +89,7 @@ namespace PRS
                     Console.WriteLine("Selected feature is not accessible for this user.");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.ReadLine();
@@ -94,41 +102,40 @@ namespace PRS
         public void FetchAllUsers(string filepath)
         {
             UserRepository userrepo = new UserRepository();
-           
+
             List<User> users = userrepo.FetchAllUsers(filepath);
             Console.WriteLine("Following is the Users List");
             Console.WriteLine();
             Console.WriteLine("-------------------------------------------------------");
-            Console.WriteLine("UserName "+"        |         "+ " Enabled " +"       |         "+"UserType");
+            Console.WriteLine("UserName " + "        |         " + " Enabled " + "       |         " + "UserType");
             Console.WriteLine("-------------------------------------------------------");
             foreach (User user in users)
             {
                 Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(user.Username + "           |            " + user.Active+"       |         "+user.UserType);
+                Console.WriteLine(user.Username + "           |            " + user.Active + "       |         " + user.UserType);
                 Console.WriteLine("-------------------------------------------------------");
             }
         }
         public void FetchAllPatients(string filepath)
         {
             PatientRepository patientrepo = new PatientRepository();
-
             List<Patients> patients = patientrepo.FetchAllPatients(filepath);
             Console.WriteLine("Following is the Patients List");
             Console.WriteLine();
             Console.WriteLine("-------------------------------------------------------");
-            Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       "+"Contact");
+            Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       " + "Contact");
             Console.WriteLine("-------------------------------------------------------");
             foreach (Patients patient in patients)
             {
                 Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth+ "       |       "+ patient.PhoneNumber);
+                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth + "       |       " + patient.PhoneNumber);
                 Console.WriteLine("-------------------------------------------------------");
             }
         }
         public void AddUser(string filepath)
         {
             UserRepository userrepo = new UserRepository();
-         //   string connectionString = "Server=PRECISION-SRIJ\\SQLEXPRESS;Database=PRS;Trusted_Connection=True;";
+            //   string connectionString = "Server=PRECISION-SRIJ\\SQLEXPRESS;Database=PRS;Trusted_Connection=True;";
             User usr = new User();
             Console.WriteLine("Enter UserName");
             usr.Username = Console.ReadLine();
@@ -143,13 +150,13 @@ namespace PRS
                 Console.WriteLine("1. Admin");
                 Console.WriteLine("2. Doctor");
                 Console.WriteLine("3. Nurse");
-                string userType= Console.ReadLine();
-                switch(userType)
+                string userType = Console.ReadLine();
+                switch (userType)
                 {
                     case "1":
                         usr.UserType = "Admin";
                         break;
-                        
+
                     case "2":
                         usr.UserType = "Doctor";
                         break;
@@ -163,14 +170,13 @@ namespace PRS
                 {
                     userrepo.SaveUser(usr, filepath);
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message);}
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
             else
             {
                 Console.WriteLine("User " + usr.Username + " already exists");
             }
         }
-
         public void AddNewPatient(string filepath)
         {
             Patients patient = new Patients();
@@ -185,15 +191,13 @@ namespace PRS
             Console.WriteLine("Enter NHS Number");
             patient.NHSNumber = Console.ReadLine();
             patient.HospitalNumber = "PRS-" + DateTime.Now.ToString("yyyyMMdd");
-            PatientRepository patientrepo= new PatientRepository();
+            PatientRepository patientrepo = new PatientRepository();
             patientrepo.SavePatient(patient, filepath);
         }
-
-        
         public void ChangePassword(string filepath)
         {
             UserRepository userrepo = new UserRepository();
-           // User usr = new User();
+            // User usr = new User();
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
             List<User> users = userrepo.FetchAllUsers(filepath);
@@ -219,7 +223,7 @@ namespace PRS
         public void EnableUser(string filepath)
         {
             // User usr = new User();
-            UserRepository userrepo=new UserRepository();   
+            UserRepository userrepo = new UserRepository();
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
             List<User> users = userrepo.FetchAllUsers(filepath);
@@ -280,7 +284,7 @@ namespace PRS
         public void UpdateUserType(string filepath)
         {
             UserRepository userrepo = new UserRepository();
-              //User usr = new User();
+            //User usr = new User();
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
             List<User> users = userrepo.FetchAllUsers(filepath);
@@ -290,7 +294,7 @@ namespace PRS
 
                 try
                 {
-                   // usr.Username = Username;
+                    // usr.Username = Username;
                     Console.WriteLine("Select UserType");
                     Console.WriteLine("1. Admin");
                     Console.WriteLine("2. Doctor");
@@ -323,6 +327,46 @@ namespace PRS
                 Console.WriteLine("User " + Username + " doesn't exist.");
             }
         }
+        public void SearchPatient(string filepath)
+        {
+            PatientRepository patientrepo = new PatientRepository();
 
+            List<Patients> patients = patientrepo.FetchAllPatients(filepath);
+            Console.WriteLine("Enter Hopital number of Patient");
+            string hospitalnumber = Console.ReadLine();
+
+            Patients patient = patients.Find(u => u.HospitalNumber == hospitalnumber);
+            if (patient == null)
+            {
+                Console.WriteLine("Patient not found");
+            }
+            else
+            {
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       " + "Contact");
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth + "       |       " + patient.PhoneNumber);
+                Console.WriteLine("-------------------------------------------------------");
+
+
+            }
+        }
+
+        public void AddAppointment()
+        {
+            var appointmentfilepath = ConfigurationManager.AppSettings["patientappointmentsfilepath"];
+            AppointmentRepository apprepo = new AppointmentRepository();
+            //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
+            Appointment appoinment = new Appointment();
+            Console.WriteLine("Enter Patient Hospital Number");
+            appoinment.HospitalNumber = Console.ReadLine();
+            Console.WriteLine("Enter Appointment Date");
+            appoinment.AppointmentDate = Console.ReadLine();
+            Console.WriteLine("Enter Appointment Time");
+            appoinment.AppointmentTime = Console.ReadLine();
+            appoinment.Active = true;
+            apprepo.SaveAppointment(appoinment, appointmentfilepath);
+        }
     }
 }

@@ -10,6 +10,55 @@ namespace PRS.Repository
 {
     public class AppointmentRepository
     {
+
+        public void SaveAppointment(Appointment appointment, string filepath)
+        {
+            var appointments = FetchAllAppointments(filepath);
+            //  patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
+            appointments.Add(appointment);
+            WriteUsersToCsv(filepath, appointments);
+        }
+        public List<Appointment> FetchAllAppointments(string filePath)
+        {
+            //var filePath = @"C:\temp\PRS\patients.csv";
+            var appointments = new List<Appointment>();
+            if (File.Exists(filePath))
+            {
+                var lines = File.ReadAllLines(filePath);
+
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var values = lines[i].Split(',');
+
+                    var appointment = new Appointment
+                    {
+                        HospitalNumber = values[0],
+                        AppointmentDate = values[1],
+                        AppointmentTime = values[2],
+                        DoctorName = values[3],
+                        Active = Convert.ToBoolean(values[4])
+                    };
+                    appointments.Add(appointment);
+                }
+            }
+            else
+            {
+                Console.WriteLine("CSV file not found.");
+            }
+            return appointments;
+        }
+
+        public void WriteUsersToCsv(string filePath, List<Appointment> appointments)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                foreach (var appointment in appointments)
+                {
+                    writer.WriteLine($"{appointment.HospitalNumber},{appointment.AppointmentDate},{appointment.AppointmentTime},{appointment.DoctorName},{appointment.Active}");
+                }
+            }
+        }
         //public void SaveAppointment(Appointment appointment, string connectionString)
         //{
         //    using (SqlConnection connection = new SqlConnection(connectionString))

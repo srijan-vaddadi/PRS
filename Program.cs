@@ -1,4 +1,11 @@
-﻿using PRS.Repository;using System.Numerics;using System.Configuration;namespace PRS{    class Program    {
+﻿using PRS.Repository;
+using System.Numerics;
+using System.Configuration;
+
+namespace PRS
+{
+    class Program
+    {
         static void Main()
         {
             Console.WriteLine("Select your choice");
