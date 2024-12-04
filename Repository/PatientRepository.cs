@@ -10,69 +10,59 @@ namespace PRS.Repository
 {
     public class PatientRepository
     {
-        public void SavePatient(Patients patient, string connectionString)
+        
+
+        public void SavePatient(Patients patient,string filepath)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_InsertUser";
-                using (SqlCommand command = new SqlCommand(spname, connection))
-                {
-                    command.Parameters.AddWithValue("@FirstName", patient.FirstName);
-                    command.Parameters.AddWithValue("@Surname", patient.Surname);
-                    command.Parameters.AddWithValue("@DateOfBirth", patient.DateOfBirth);
-                    command.Parameters.AddWithValue("@PhoneNumber", patient.PhoneNumber); 
-                    command.Parameters.AddWithValue("@NHSNumber", patient.NHSNumber);
-                    command.Parameters.AddWithValue("@HospitalNumber", patient.HospitalNumber);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = spname;
-
-
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
-                }
-            }
+            var patients = FetchAllPatients(filepath);
+            patient.HospitalNumber=patient.HospitalNumber+"-"+(patients.Count+1).ToString();
+            patients.Add(patient);
+            WriteUsersToCsv(filepath, patients);
         }
-        public List<Patients> FetchAllPatients(string connectionString)
+        public List<Patients> FetchAllPatients(string filePath)
         {
-            List<Patients> patients = new List<Patients>();
+            //var filePath = @"C:\temp\PRS\patients.csv";
+            var patients = new List<Patients>();
+            if (File.Exists(filePath))
+            {
+                var lines = File.ReadAllLines(filePath);
 
-            Patients patient;
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    connection.Open();
-                    string spname = "Sp_FetchAllPatients";
-                    using (SqlCommand command = new SqlCommand(spname, connection))
+                    var values = lines[i].Split(',');
+
+                    var patient = new Patients
                     {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = spname;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                patient = new Patients();
-                                patient.HospitalNumber = reader.GetString(0);
-                                patient.FirstName = reader.GetString(1);
-                                patient.Surname = reader.GetString(2);
-                                patient.DateOfBirth = reader.GetDateTime(3);
-                                patient.PhoneNumber = reader.GetString(4);
-                                patient.NHSNumber = reader.GetString(5);
-                                patients.Add(patient);
-                            }
-                        }
-                    }
+                        FirstName = values[0],
+                        Surname = values[1],
+                        DateOfBirth = values[2],
+                        PhoneNumber = values[3],
+                        NHSNumber= values[4],
+                        HospitalNumber=values[5]
+
+                    };
+
+                    patients.Add(patient);
                 }
+
+
+
             }
-            catch (Exception)
+            else
             {
-                throw;
+                Console.WriteLine("CSV file not found.");
             }
             return patients;
+        }
+
+        public void WriteUsersToCsv(string filePath, List<Patients> patients)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                foreach (var patient in patients)
+                { writer.WriteLine($"{patient.FirstName},{patient.Surname},{patient.DateOfBirth},{patient.PhoneNumber},{patient.NHSNumber},{patient.HospitalNumber}"); }
+            }
         }
     }
 }

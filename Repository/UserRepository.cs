@@ -14,9 +14,9 @@ namespace PRS.Repository
     {
       
 
-        public List<User> FetchAllUsers()
+        public List<User> FetchAllUsers(string filePath)
         {
-            var filePath = @"C:\Users\srija\Srijan\Project\PRS\Data\users.csv";
+          //  var filePath = @"C:\temp\PRS\users.csv";
 
 
             var users = new List<User>();
@@ -54,19 +54,12 @@ namespace PRS.Repository
             return users;
         }
         
-        public void SaveUser(User user)
+        public void SaveUser(User user,string filepath)
         {
-            var filePath = @"C:\Users\srija\Srijan\Project\PRS\Data\users.csv";
-            var users = FetchAllUsers();
-
+        
+            var users = FetchAllUsers(filepath);
             users.Add(user);
-
-            // Writing to CSV using CsvHelper
-            using (var writer = new StreamWriter(filePath))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                WriteUsersToCsv(filePath, users);
-            }
+                WriteUsersToCsv(filepath, users);
           }
             public void UpdateUser(User user, string connectionString)
         {
@@ -98,133 +91,6 @@ namespace PRS.Repository
             { foreach (var user in users) 
                 { writer.WriteLine($"{user.Username},{user.Password},{user.UserType},{user.Active}");}
             } 
-        }
-        public void ChangeUserPassword(User user, string connectionString)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_ChangeUserPassword";
-                using (SqlCommand command = new SqlCommand(spname, connection))
-                {
-                    command.Parameters.AddWithValue("@UserName", user.Username);
-                    command.Parameters.AddWithValue("@Password", user.Password);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = spname;
-
-
-                   command.ExecuteNonQuery();
-
-                   // Console.WriteLine($"{rowsAffected} row(s) Updated.");
-                }
-            }
-        }
-        public void EnableuserAccount(string username, string connectionString)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_EnableuserAccount";
-                using (SqlCommand command = new SqlCommand(spname, connection))
-                {
-                    command.Parameters.AddWithValue("@UserName",username);
-                 //   command.Parameters.AddWithValue("@Active", 1);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = spname;
-
-
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
-                }
-            }
-        }
-
-        public void DisableuserAccount(string username, string connectionString)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_DisableuserAccount";
-                using (SqlCommand command = new SqlCommand(spname, connection))
-                {
-                    command.Parameters.AddWithValue("@UserName", username);
-                    //   command.Parameters.AddWithValue("@Active", 1);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = spname;
-
-
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
-                }
-            }
-        }
-
-        public void UpdateUserType(User usr, string connectionString)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
-                string spname = "Sp_UpdateUserType";
-                using (SqlCommand command = new SqlCommand(spname, connection))
-                {
-                    command.Parameters.AddWithValue("@UserName", usr.Username);
-                   // command.Parameters.AddWithValue("@UserType", usr.UserTypeId);
-//
-                    //   command.Parameters.AddWithValue("@Active", 1);
-
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = spname;
-
-
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    Console.WriteLine($"{rowsAffected} row(s) inserted.");
-                }
-            }
-        }
-        public List<Feature> FetchUserFeatures(string connectionString, string UserTypeId)
-        {
-            List<Feature> features = new List<Feature>();
-
-            Feature feature;
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    string spname = "Sp_FetchUserFeatures";
-                    using (SqlCommand command = new SqlCommand(spname, connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.CommandText = spname;
-                        command.Parameters.Add("@UserTypeId", SqlDbType.Int).Value = 1;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                feature = new Feature();
-                                feature.FeatureId = (int)reader["FeatureId"];
-                                feature.FeatureName = (string)reader["FeatureName"];
-                                features.Add(feature);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            return features;
-        }
+        }     
     }
 }
