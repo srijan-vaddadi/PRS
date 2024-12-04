@@ -11,7 +11,7 @@ namespace PRS
         public string HospitalNumber { get; set; }
         public string FirstName { get; set; }
         public string Surname { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string PhoneNumber { get; set; }
         public string NHSNumber { get; set; }
     }

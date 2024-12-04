@@ -8,7 +8,7 @@ namespace PRS
 {
     public abstract class Users
     {     
-        public abstract void DisplayFeatures(string connectionstring, User usr);
+        public abstract void DisplayFeatures(User usr,string filepath,string patientFilepath);
 
         
     }
