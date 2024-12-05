@@ -13,5 +13,6 @@ namespace PRS
         public string AppointmentTime { get; set; }
         public string DoctorName { get; set; }
         public bool Active { get; set; }
+
     }
 }

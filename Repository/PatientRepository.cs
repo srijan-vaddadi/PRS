@@ -10,22 +10,49 @@ namespace PRS.Repository
 {
     public class PatientRepository
     {
-        
-
+        #region Save
         public void SavePatient(Patients patient,string filepath)
         {
             var patients = FetchAllPatients(filepath);
             patient.HospitalNumber=patient.HospitalNumber+"-"+(patients.Count+1).ToString();
             patients.Add(patient);
-            WriteUsersToCsv(filepath, patients);
+            WritePatientsToCsv(filepath, patients);
         }
+        public void SaveAppointment(Appointment appointment, string filepath)
+        {
+            var appointments = FetchAllAppointments(filepath);
+            //  patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
+            appointments.Add(appointment);
+            WriteAppointmentsToCsv(filepath, appointments);
+        }
+        public void SavePatientPrescription(Prescription prescription, string filepath)
+        {
+            var prescriptions = FetchPrescriptions(filepath);
+            //patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
+            prescriptions.Add(prescription);
+            WritePrescriptionsToCsv(filepath, prescriptions);
+        }
+        public void SavePatientNotes(PatientNotes note, string filepath)
+        {
+            var notes = FetchPatientNotes(filepath);
+            //patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
+            notes.Add(note);
+            WritePatientNotesToCsv(filepath, notes);
+        }
+
+        #endregion
+
+        #region Fetch
         public List<Patients> FetchAllPatients(string filePath)
         {
             //var filePath = @"C:\temp\PRS\patients.csv";
             var patients = new List<Patients>();
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
-                var lines = File.ReadAllLines(filePath);
+                FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                fs.Close();
+            }
+            var lines = File.ReadAllLines(filePath);
 
 
                 for (int i = 0; i < lines.Length; i++)
@@ -45,18 +72,93 @@ namespace PRS.Repository
 
                     patients.Add(patient);
                 }
-
-
-
-            }
-            else
-            {
-                Console.WriteLine("CSV file not found.");
-            }
+            
             return patients;
         }
+        public List<Prescription> FetchPrescriptions(string filePath)
+        {
+            var prescriptions = new List<Prescription>();
+            if (!File.Exists(filePath))
+            {
+                FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                fs.Close();
+            }
+            var lines = File.ReadAllLines(filePath);
 
-        public void WriteUsersToCsv(string filePath, List<Patients> patients)
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var values = lines[i].Split(',');
+
+                    var prescription = new Prescription
+                    {
+                        HospitalNumber = values[0],
+                        Medicine = values[1]
+
+
+                    };
+                    prescriptions.Add(prescription);
+                }
+           
+            return prescriptions;
+        }
+        public List<Appointment> FetchAllAppointments(string filePath)
+        {
+            //var filePath = @"C:\temp\PRS\patients.csv";
+            var appointments = new List<Appointment>();
+
+            if (!File.Exists(filePath))
+            {
+                FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                fs.Close();
+            }
+
+            var lines = File.ReadAllLines(filePath);
+
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var values = lines[i].Split(',');
+
+                    var appointment = new Appointment
+                    {
+                        HospitalNumber = values[0],
+                        AppointmentDate = values[1],
+                        AppointmentTime = values[2],
+                        DoctorName = values[3],
+                        Active = Convert.ToBoolean(values[4])
+                    };
+                    appointments.Add(appointment);
+                }
+            
+            return appointments;
+        }
+        public List<PatientNotes> FetchPatientNotes(string filePath)
+        {
+            var notes = new List<PatientNotes>();
+            if (!File.Exists(filePath))
+            {
+                FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                fs.Close();
+            }
+            var lines = File.ReadAllLines(filePath);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var values = lines[i].Split(',');
+                    var note = new PatientNotes
+                    {
+                        HospitalNumber = values[0],
+                        Notes = values[1]
+                    };
+                    notes.Add(note);
+                }
+            
+            return notes;
+        }
+
+        #endregion
+
+        #region Write
+        public void WritePatientsToCsv(string filePath, List<Patients> patients)
         {
             using (StreamWriter writer = new StreamWriter(filePath))
             {
@@ -64,5 +166,35 @@ namespace PRS.Repository
                 { writer.WriteLine($"{patient.FirstName},{patient.Surname},{patient.DateOfBirth},{patient.PhoneNumber},{patient.NHSNumber},{patient.HospitalNumber}"); }
             }
         }
+        public void WritePrescriptionsToCsv(string filePath, List<Prescription> prescriptions)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                foreach (var prescription in prescriptions)
+                { writer.WriteLine($"{prescription.HospitalNumber},{prescription.Medicine}"); }
+            }
+        }
+        public void WriteAppointmentsToCsv(string filePath, List<Appointment> appointments)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                foreach (var appointment in appointments)
+                {
+                    writer.WriteLine($"{appointment.HospitalNumber},{appointment.AppointmentDate},{appointment.AppointmentTime},{appointment.DoctorName},{appointment.Active}");
+                }
+            }
+        }
+        public void WritePatientNotesToCsv(string filePath, List<PatientNotes> notes)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                foreach (var note in notes)
+                {
+                    writer.WriteLine($"{note.HospitalNumber},{note.Notes}");
+                }
+            }
+        }
+
+        #endregion
     }
 }

@@ -79,6 +79,31 @@ namespace PRS
                             Console.WriteLine("Appointment  Added Successfully");
                             Console.ReadLine();
                             break;
+                        case "AddPrescription":
+                            AddPrescription();
+                            Console.WriteLine("Prescription  Added Successfully");
+                            Console.ReadLine();
+                            break;
+                        case "AddPatientNotes":
+                            AddPatientNotes();
+                            Console.WriteLine("Patient Notes  Added Successfully");
+                            Console.ReadLine();
+                            break;
+                        case "ViewAppointments":
+                            ViewAppoinments();
+                          //  Console.WriteLine("Patient Notes  Added Successfully");
+                            Console.ReadLine();
+                            break;
+                        case "ViewPrescriptions":
+                            ViewPrescriptions();
+                            //  Console.WriteLine("Patient Notes  Added Successfully");
+                            Console.ReadLine();
+                            break;
+                        case "ViewPatientNotes":
+                            ViewPatientNotes();
+                            //  Console.WriteLine("Patient Notes  Added Successfully");
+                            Console.ReadLine();
+                            break;
                         default:
                             Console.WriteLine("Unknown feature.");
                             break;
@@ -99,6 +124,8 @@ namespace PRS
         {
             Console.WriteLine("LoggedOut Successfully");
         }
+
+        #region User
         public void FetchAllUsers(string filepath)
         {
             UserRepository userrepo = new UserRepository();
@@ -115,23 +142,7 @@ namespace PRS
                 Console.WriteLine(user.Username + "           |            " + user.Active + "       |         " + user.UserType);
                 Console.WriteLine("-------------------------------------------------------");
             }
-        }
-        public void FetchAllPatients(string filepath)
-        {
-            PatientRepository patientrepo = new PatientRepository();
-            List<Patients> patients = patientrepo.FetchAllPatients(filepath);
-            Console.WriteLine("Following is the Patients List");
-            Console.WriteLine();
-            Console.WriteLine("-------------------------------------------------------");
-            Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       " + "Contact");
-            Console.WriteLine("-------------------------------------------------------");
-            foreach (Patients patient in patients)
-            {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth + "       |       " + patient.PhoneNumber);
-                Console.WriteLine("-------------------------------------------------------");
-            }
-        }
+        }      
         public void AddUser(string filepath)
         {
             UserRepository userrepo = new UserRepository();
@@ -176,24 +187,7 @@ namespace PRS
             {
                 Console.WriteLine("User " + usr.Username + " already exists");
             }
-        }
-        public void AddNewPatient(string filepath)
-        {
-            Patients patient = new Patients();
-            Console.WriteLine("Enter FirstName");
-            patient.FirstName = Console.ReadLine();
-            Console.WriteLine("Enter Surname");
-            patient.Surname = Console.ReadLine();
-            Console.WriteLine("Enter DOB");
-            patient.DateOfBirth = Console.ReadLine();
-            Console.WriteLine("Enter PhoneNumber");
-            patient.PhoneNumber = Console.ReadLine();
-            Console.WriteLine("Enter NHS Number");
-            patient.NHSNumber = Console.ReadLine();
-            patient.HospitalNumber = "PRS-" + DateTime.Now.ToString("yyyyMMdd");
-            PatientRepository patientrepo = new PatientRepository();
-            patientrepo.SavePatient(patient, filepath);
-        }
+        }    
         public void ChangePassword(string filepath)
         {
             UserRepository userrepo = new UserRepository();
@@ -327,6 +321,42 @@ namespace PRS
                 Console.WriteLine("User " + Username + " doesn't exist.");
             }
         }
+        #endregion
+
+        #region Patient
+        public void FetchAllPatients(string filepath)
+        {
+            PatientRepository patientrepo = new PatientRepository();
+            List<Patients> patients = patientrepo.FetchAllPatients(filepath);
+            Console.WriteLine("Following is the Patients List");
+            Console.WriteLine();
+            Console.WriteLine("-------------------------------------------------------");
+            Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       " + "Contact");
+            Console.WriteLine("-------------------------------------------------------");
+            foreach (Patients patient in patients)
+            {
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth + "       |       " + patient.PhoneNumber);
+                Console.WriteLine("-------------------------------------------------------");
+            }
+        }
+        public void AddNewPatient(string filepath)
+        {
+            Patients patient = new Patients();
+            Console.WriteLine("Enter FirstName");
+            patient.FirstName = Console.ReadLine();
+            Console.WriteLine("Enter Surname");
+            patient.Surname = Console.ReadLine();
+            Console.WriteLine("Enter DOB");
+            patient.DateOfBirth = Console.ReadLine();
+            Console.WriteLine("Enter PhoneNumber");
+            patient.PhoneNumber = Console.ReadLine();
+            Console.WriteLine("Enter NHS Number");
+            patient.NHSNumber = Console.ReadLine();
+            patient.HospitalNumber = "PRS-" + DateTime.Now.ToString("yyyyMMdd");
+            PatientRepository patientrepo = new PatientRepository();
+            patientrepo.SavePatient(patient, filepath);
+        }
         public void SearchPatient(string filepath)
         {
             PatientRepository patientrepo = new PatientRepository();
@@ -352,11 +382,10 @@ namespace PRS
 
             }
         }
-
         public void AddAppointment()
         {
             var appointmentfilepath = ConfigurationManager.AppSettings["patientappointmentsfilepath"];
-            AppointmentRepository apprepo = new AppointmentRepository();
+            PatientRepository apprepo = new PatientRepository();
             //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
             Appointment appoinment = new Appointment();
             Console.WriteLine("Enter Patient Hospital Number");
@@ -365,8 +394,133 @@ namespace PRS
             appoinment.AppointmentDate = Console.ReadLine();
             Console.WriteLine("Enter Appointment Time");
             appoinment.AppointmentTime = Console.ReadLine();
+            Console.WriteLine("Enter Doctor Name");
+            appoinment.DoctorName = Console.ReadLine();
             appoinment.Active = true;
             apprepo.SaveAppointment(appoinment, appointmentfilepath);
         }
+
+        public void ViewAppoinments()
+        {
+            PatientRepository apprepo = new PatientRepository();
+            var appointmentfilepath = ConfigurationManager.AppSettings["patientappointmentsfilepath"];
+            List<Appointment> appointments = apprepo.FetchAllAppointments(appointmentfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            List<Appointment> appointment = new List<Appointment>();
+            foreach(Appointment  app in appointments.Where(u => u.HospitalNumber == patientnumber).ToList())
+            {
+                appointment.Add(app);
+            }
+            if (appointment.Count == 0)
+            {
+                Console.WriteLine("Don't have any appointments for the given patient.");
+            }
+            else
+            {
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("HospitalNumber " + "        |         " + " AppointmentDate " + "       |       " + "AppointmentTime" + "       |       " + "DoctorName");
+                Console.WriteLine("-------------------------------------------------------");
+                foreach (var app in appointment)
+                {
+                    Console.WriteLine("-------------------------------------------------------");
+                    Console.WriteLine(app.HospitalNumber + "        |        " + app.AppointmentDate + "       |         " + app.AppointmentTime + "       |       " + app.DoctorName);
+                    Console.WriteLine("-------------------------------------------------------");
+                }
+
+            }
+
+        }
+
+        public void ViewPrescriptions()
+        {
+            PatientRepository apprepo = new PatientRepository();
+            var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
+            List<Prescription> prescriptions = apprepo.FetchPrescriptions(prescriptionfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            List<Prescription> prescription = new List<Prescription>();
+            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber).ToList())
+            {
+                prescription.Add(app);
+            }
+            if (prescription.Count == 0)
+            {
+                Console.WriteLine("Don't have any Prescriptions for the given patient.");
+            }
+            else
+            {
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("HospitalNumber " + "        |         " + " Medicine ");
+                Console.WriteLine("-------------------------------------------------------");
+                foreach (var app in prescription)
+                {
+                    Console.WriteLine("-------------------------------------------------------");
+                    Console.WriteLine(app.HospitalNumber + "        |        " + app.Medicine );
+                    Console.WriteLine("-------------------------------------------------------");
+                }
+
+            }
+
+        }
+
+        public void ViewPatientNotes()
+        {
+            PatientRepository apprepo = new PatientRepository();
+            var notesfilepath = ConfigurationManager.AppSettings["patientnotesfilepath"];
+            List<PatientNotes> notes = apprepo.FetchPatientNotes(notesfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            List<PatientNotes> note = new List<PatientNotes>();
+            foreach (PatientNotes app in notes.Where(u => u.HospitalNumber == patientnumber).ToList())
+            {
+                note.Add(app);
+            }
+            if (note.Count == 0)
+            {
+                Console.WriteLine("Don't have any Patient Notes for the given patient.");
+            }
+            else
+            {
+                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("HospitalNumber " + "        |         " + " Notes ");
+                Console.WriteLine("-------------------------------------------------------");
+                foreach (var app in note)
+                {
+                    Console.WriteLine("-------------------------------------------------------");
+                    Console.WriteLine(app.HospitalNumber + "        |        " + app.Notes);
+                    Console.WriteLine("-------------------------------------------------------");
+                }
+
+            }
+
+        }
+        public void AddPrescription()
+        {
+            var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
+            Prescription prescription = new Prescription();
+            Console.WriteLine("Enter Patient Hospital Number");
+            prescription.HospitalNumber = Console.ReadLine();
+            Console.WriteLine("Enter Medicine Name");
+            prescription.Medicine = Console.ReadLine();          
+            apprepo.SavePatientPrescription(prescription, prescriptionfilepath);
+        }
+
+        public void AddPatientNotes()
+        {
+            var notesfilepath = ConfigurationManager.AppSettings["patientnotesfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
+            PatientNotes note = new PatientNotes();
+            Console.WriteLine("Enter Patient Hospital Number");
+            note.HospitalNumber = Console.ReadLine();
+            Console.WriteLine("Enter Notes");
+            note.Notes = Console.ReadLine();
+            apprepo.SavePatientNotes(note, notesfilepath);
+        }
+
+        #endregion
     }
 }

@@ -18,7 +18,14 @@ namespace PRS
             List<Feature> features = new List<Feature>{
                 new Feature(1, "Logout"),
                 new Feature(2,"AddNewPatient"),
-                new Feature(3,"FetchAllPatients")
+                new Feature(3,"FetchAllPatients"),
+                new Feature(4,"SearchPatient"),
+                new Feature(5,"AddAppointment"),
+                new Feature(6,"AddPrescription"),
+                new Feature(7,"AddPatientNotes"),
+                new Feature(8,"ViewAppointments"),
+                new Feature(9,"ViewPrescriptions"),
+                new Feature(10,"ViewPatientNotes")
             };
 
             foreach (Feature feature in features)
