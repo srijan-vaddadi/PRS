@@ -16,7 +16,7 @@ namespace PRS.Repository
 
         public List<User> FetchAllUsers(string filePath)
         {
-          //  var filePath = @"C:\temp\PRS\users.csv";
+          
 
 
             var users = new List<User>();
@@ -65,16 +65,12 @@ namespace PRS.Repository
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                //   string query = "INSERT INTO users (UserName, Password,Active) VALUES (@UserName, @Password,@Active)";
+                connection.Open();               
                 string spname = "Sp_UpdateUser";
                 using (SqlCommand command = new SqlCommand(spname, connection))
                 {
                     command.Parameters.AddWithValue("@UserName", user.Username);
                     command.Parameters.AddWithValue("@Password", user.Password);
-                  //  command.Parameters.AddWithValue("@Active", 1);
-                 //   command.Parameters.AddWithValue("@UserType", );
-//
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = spname;
 

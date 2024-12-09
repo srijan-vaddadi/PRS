@@ -8,13 +8,31 @@ namespace PRS
 {
     public abstract class Users
     {     
-        public abstract void DisplayFeatures(User usr,string filepath,string patientFilepath);
-
-        
+        public abstract void DisplayFeatures(User usr);
+        public void RunFeatures(List<Feature> features,User user)
+        {
+            int featureId = 0;
+            while (featureId != 1)
+            {
+                Console.WriteLine("Please select one of the below options");
+                foreach (Feature feature in features)
+                {
+                    Console.WriteLine(feature.FeatureId + ". " + feature.FeatureName);
+                }
+                featureId = Convert.ToInt32(Console.ReadLine());
+                Feature featurename = features.Find(f => f.FeatureId == featureId);
+                Feature onjFeature = new Feature();
+                onjFeature.ExecuteFeature(featurename.FeatureName, user);
+                if (featureId != 1)
+                {
+                    Console.WriteLine("\nPress any key to return to the menu...");
+                    Console.ReadKey();
+                }
+            }
+        } 
     }
     public class User
-    {
-      //  public int UserID { get; set; }
+    {    
         public string Username { get; set; }
         public string Password { get; set; }
         public string UserType { get; set; }

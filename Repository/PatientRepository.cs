@@ -20,22 +20,19 @@ namespace PRS.Repository
         }
         public void SaveAppointment(Appointment appointment, string filepath)
         {
-            var appointments = FetchAllAppointments(filepath);
-            //  patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
+            var appointments = FetchAllAppointments(filepath);          
             appointments.Add(appointment);
             WriteAppointmentsToCsv(filepath, appointments);
         }
         public void SavePatientPrescription(Prescription prescription, string filepath)
         {
             var prescriptions = FetchPrescriptions(filepath);
-            //patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
             prescriptions.Add(prescription);
             WritePrescriptionsToCsv(filepath, prescriptions);
         }
         public void SavePatientNotes(PatientNotes note, string filepath)
         {
-            var notes = FetchPatientNotes(filepath);
-            //patient.HospitalNumber = patient.HospitalNumber + "-" + (patients.Count + 1).ToString();
+            var notes = FetchPatientNotes(filepath);           
             notes.Add(note);
             WritePatientNotesToCsv(filepath, notes);
         }
@@ -45,7 +42,7 @@ namespace PRS.Repository
         #region Fetch
         public List<Patients> FetchAllPatients(string filePath)
         {
-            //var filePath = @"C:\temp\PRS\patients.csv";
+          
             var patients = new List<Patients>();
             if (!File.Exists(filePath))
             {
@@ -102,8 +99,7 @@ namespace PRS.Repository
             return prescriptions;
         }
         public List<Appointment> FetchAllAppointments(string filePath)
-        {
-            //var filePath = @"C:\temp\PRS\patients.csv";
+        {           
             var appointments = new List<Appointment>();
 
             if (!File.Exists(filePath))

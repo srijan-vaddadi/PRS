@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace PRS
             FeatureName = name;
         }
         public Feature() { }
-        public void ExecuteFeature(string selectedFeature, User user, string filePath, string patientFilepath)
+        public void ExecuteFeature(string selectedFeature, User user)
         {
             try
             {
@@ -26,83 +27,81 @@ namespace PRS
                 {
                     switch (selectedFeature)
                     {
+                        case "Login":
+                            Login();
+                            break;
                         case "Logout":
                             Logout();
                             Console.ReadLine();
                             break;
                         case "FetchAllUsers":
-                            FetchAllUsers(filePath);
-                            Console.ReadLine();
+                            FetchAllUsers();
+                           
                             break;
                         case "AddUser":
-                            AddUser(filePath);
-                            Console.WriteLine("User Created Successfully");
-                            Console.ReadLine();
+                            AddUser();
+                            
+                            
                             break;
                         case "ChangePassword":
-                            ChangePassword(filePath);
+                            ChangePassword();
                             Console.WriteLine("Password Changed Successfully");
-                            Console.ReadLine();
+                          
                             break;
                         case "EnableUser":
-                            EnableUser(filePath);
+                            EnableUser();
                             Console.WriteLine("User Enabled Successfully");
-                            Console.ReadLine();
+                           
                             break;
                         case "DisableUser":
-                            DisableUser(filePath, user);
-                            Console.WriteLine("User Disabled Successfully");
-                            Console.ReadLine();
+                            DisableUser(user);
+                            
+                           
                             break;
                         case "UpdateUserType":
-                            UpdateUserType(filePath);
+                            UpdateUserType();
                             Console.WriteLine("UserType Updated Successfully");
-                            Console.ReadLine();
+                           
                             break;
                         case "AddNewPatient":
-                            AddNewPatient(patientFilepath);
+                            AddNewPatient();
                             Console.WriteLine("Patient  Created Successfully");
-                            Console.ReadLine();
+                           
                             break;
                         case "FetchAllPatients":
-                            FetchAllPatients(patientFilepath);
-                            // Console.WriteLine("Patient  Created Successfully");
-                            Console.ReadLine();
+                            FetchAllPatients();
+                           
                             break;
                         case "SearchPatient":
-                            SearchPatient(patientFilepath);
-                            // Console.WriteLine("Patient  Created Successfully");
-                            Console.ReadLine();
+                            SearchPatient();
+                           
                             break;
                         case "AddAppointment":
                             AddAppointment();
                             Console.WriteLine("Appointment  Added Successfully");
-                            Console.ReadLine();
+                            
                             break;
                         case "AddPrescription":
                             AddPrescription();
                             Console.WriteLine("Prescription  Added Successfully");
-                            Console.ReadLine();
+                            
                             break;
                         case "AddPatientNotes":
                             AddPatientNotes();
                             Console.WriteLine("Patient Notes  Added Successfully");
-                            Console.ReadLine();
+                            
                             break;
                         case "ViewAppointments":
                             ViewAppoinments();
-                          //  Console.WriteLine("Patient Notes  Added Successfully");
-                            Console.ReadLine();
+                         
                             break;
                         case "ViewPrescriptions":
                             ViewPrescriptions();
-                            //  Console.WriteLine("Patient Notes  Added Successfully");
-                            Console.ReadLine();
+                           
                             break;
                         case "ViewPatientNotes":
                             ViewPatientNotes();
-                            //  Console.WriteLine("Patient Notes  Added Successfully");
-                            Console.ReadLine();
+                           
                             break;
                         default:
                             Console.WriteLine("Unknown feature.");
@@ -120,16 +119,110 @@ namespace PRS
                 Console.ReadLine();
             }
         }
+
+        #region User
         public void Logout()
         {
             Console.WriteLine("LoggedOut Successfully");
+
+            Console.WriteLine("");
+            Console.WriteLine("Select your choice");
+            Console.WriteLine("1. Login");
+            Console.WriteLine("2. Exit");
+            var choice = Console.ReadLine();
+          
+            switch (choice)
+            {
+                case "1":
+                    Login();
+                    break;
+                case "2":
+                    Exit();
+                    break;
+                default:
+                    return;
+
+            }
+            
         }
 
-        #region User
-        public void FetchAllUsers(string filepath)
+        public void Login()
+        {
+            var filePath = ConfigurationManager.AppSettings["userfilepath"];
+            List<User> users = new List<User>();
+            UserRepository userRepository = new UserRepository();
+            users = userRepository.FetchAllUsers(filePath);
+            if (users != null)
+            {
+                Console.WriteLine("Enter Username:");
+                string username = Console.ReadLine();
+
+                User usr = users.Find(u => u.Username == username);
+
+                if (usr == null)
+                {
+                    Console.WriteLine("User does not exist");
+                }
+                else
+                {
+                    Console.WriteLine("Enter Password: ");
+                    string password = Console.ReadLine();
+                    User usr1 = users.Find(u => u.Username == username && u.Password == password);
+
+                    if (usr1 == null)
+                    {
+                        Console.WriteLine("Username or password is incorrect");
+                    }
+                    else if (usr1.Active == false)
+                    {
+                        Console.WriteLine("Given user is Disabled.Can't login.");
+                    }
+                    else
+                    {
+                        switch (usr1.UserType)
+                        {
+                            case "Admin":
+                                Users adm = new Admin();
+                                adm.DisplayFeatures(usr1);
+                                break;
+                            case "Doctor":
+                                Users doctor = new Doctor();
+                                doctor.DisplayFeatures(usr1);
+                                break;
+                            case "Nurse":
+                                Users nurse = new Nurse();
+                                nurse.DisplayFeatures(usr1);
+                                break;
+                            default:
+                                return;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        bool IsValidEmail(string email)
+        {
+            try
+            {
+                var mailAddress = new MailAddress(email);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        public void Exit()
+        {       
+            return;
+        }
+        public void FetchAllUsers()
         {
             UserRepository userrepo = new UserRepository();
-
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
             List<User> users = userrepo.FetchAllUsers(filepath);
             Console.WriteLine("Following is the Users List");
             Console.WriteLine();
@@ -143,13 +236,19 @@ namespace PRS
                 Console.WriteLine("-------------------------------------------------------");
             }
         }      
-        public void AddUser(string filepath)
+        public void AddUser()
         {
             UserRepository userrepo = new UserRepository();
-            //   string connectionString = "Server=PRECISION-SRIJ\\SQLEXPRESS;Database=PRS;Trusted_Connection=True;";
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
             User usr = new User();
             Console.WriteLine("Enter UserName");
-            usr.Username = Console.ReadLine();
+            string username = Console.ReadLine();
+            if (!IsValidEmail(username))
+            {
+                Console.WriteLine("Email Address that you entered in Invalid");
+                return;
+            }
+            usr.Username= username;
             List<User> users = userrepo.FetchAllUsers(filepath);
             if (users.Find(u => u.Username == usr.Username) == null)
             {
@@ -180,6 +279,7 @@ namespace PRS
                 try
                 {
                     userrepo.SaveUser(usr, filepath);
+                    Console.WriteLine("User is Added.");
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
@@ -188,10 +288,10 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " already exists");
             }
         }    
-        public void ChangePassword(string filepath)
+        public void ChangePassword()
         {
             UserRepository userrepo = new UserRepository();
-            // User usr = new User();
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
             List<User> users = userrepo.FetchAllUsers(filepath);
@@ -214,10 +314,11 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " doesn't exist.");
             }
         }
-        public void EnableUser(string filepath)
+        public void EnableUser()
         {
             // User usr = new User();
             UserRepository userrepo = new UserRepository();
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
             List<User> users = userrepo.FetchAllUsers(filepath);
@@ -241,12 +342,13 @@ namespace PRS
                 Console.WriteLine("User " + Username + " doesn't exist.");
             }
         }
-        public void DisableUser(string filepath, User user)
+        public void DisableUser(User user)
         {
             UserRepository userrepo = new UserRepository();
-            //  User usr = new User();
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
+            //Admin user cannot disable own account
             if (Username != user.Username)
             {
                 List<User> users = userrepo.FetchAllUsers(filepath);
@@ -256,9 +358,9 @@ namespace PRS
 
                     try
                     {
-                        usrfound.Active = false;
-                        //userrepo.EnableuserAccount(Username, connectionstring);
+                        usrfound.Active = false;                        
                         userrepo.WriteUsersToCsv(filepath, users);
+                        Console.WriteLine("Account has been disabled");
                     }
                     catch (Exception ex)
                     {
@@ -272,13 +374,13 @@ namespace PRS
             }
             else
             {
-                Console.WriteLine("User Can't disable his own account");
+                Console.WriteLine("Admin user cannot disable own account");
             }
         }
-        public void UpdateUserType(string filepath)
+        public void UpdateUserType()
         {
             UserRepository userrepo = new UserRepository();
-            //User usr = new User();
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
             List<User> users = userrepo.FetchAllUsers(filepath);
@@ -324,9 +426,10 @@ namespace PRS
         #endregion
 
         #region Patient
-        public void FetchAllPatients(string filepath)
+        public void FetchAllPatients()
         {
             PatientRepository patientrepo = new PatientRepository();
+            var filepath = ConfigurationManager.AppSettings["patientbasicfilepath"];
             List<Patients> patients = patientrepo.FetchAllPatients(filepath);
             Console.WriteLine("Following is the Patients List");
             Console.WriteLine();
@@ -340,9 +443,10 @@ namespace PRS
                 Console.WriteLine("-------------------------------------------------------");
             }
         }
-        public void AddNewPatient(string filepath)
+        public void AddNewPatient()
         {
             Patients patient = new Patients();
+            var filepath = ConfigurationManager.AppSettings["patientbasicfilepath"];
             Console.WriteLine("Enter FirstName");
             patient.FirstName = Console.ReadLine();
             Console.WriteLine("Enter Surname");
@@ -357,10 +461,10 @@ namespace PRS
             PatientRepository patientrepo = new PatientRepository();
             patientrepo.SavePatient(patient, filepath);
         }
-        public void SearchPatient(string filepath)
+        public void SearchPatient()
         {
             PatientRepository patientrepo = new PatientRepository();
-
+            var filepath = ConfigurationManager.AppSettings["patientbasicfilepath"];
             List<Patients> patients = patientrepo.FetchAllPatients(filepath);
             Console.WriteLine("Enter Hopital number of Patient");
             string hospitalnumber = Console.ReadLine();

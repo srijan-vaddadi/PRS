@@ -9,12 +9,9 @@ namespace PRS
 {
     public class Doctor : Users
     {
-        public override void DisplayFeatures(User user, string filePath, string patientFilepath)
+        public override void DisplayFeatures(User user)
         {
-            Console.WriteLine("Please select one of the below options");
-            UserRepository usr = new UserRepository();
-            //    List<Feature> features= usr.FetchUserFeatures(connectionstring, "1");
-
+         
             List<Feature> features = new List<Feature>{
                 new Feature(1, "Logout"),
                 new Feature(2,"AddNewPatient"),
@@ -28,16 +25,7 @@ namespace PRS
                 new Feature(10,"ViewPatientNotes")
             };
 
-            foreach (Feature feature in features)
-            {
-                Console.WriteLine(feature.FeatureId + ". " + feature.FeatureName);
-            }
-            int featureid = Convert.ToInt32(Console.ReadLine());
-            Feature featurename = features.Find(f => f.FeatureId == featureid);
-            Feature onjFeature = new Feature();
-            onjFeature.ExecuteFeature(featurename.FeatureName, user, filePath, patientFilepath);
-            //Console.WriteLine("1. Add User");
-            //Console.WriteLine("2. View Users");
+           RunFeatures(features,user);
         }
     }
 
