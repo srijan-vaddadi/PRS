@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PRS
 {
@@ -45,63 +46,44 @@ namespace PRS
                             break;
                         case "ChangePassword":
                             ChangePassword();
-                            Console.WriteLine("Password Changed Successfully");
-                          
+                                                   
                             break;
                         case "EnableUser":
                             EnableUser();
-                            Console.WriteLine("User Enabled Successfully");
-                           
+                                                     
                             break;
                         case "DisableUser":
-                            DisableUser(user);
-                            
-                           
+                            DisableUser(user);                                                      
                             break;
                         case "UpdateUserType":
-                            UpdateUserType();
-                            Console.WriteLine("UserType Updated Successfully");
-                           
+                            UpdateUserType();                                                      
                             break;
                         case "AddNewPatient":
-                            AddNewPatient();
-                            Console.WriteLine("Patient  Created Successfully");
-                           
+                            AddNewPatient();                                                     
                             break;
                         case "FetchAllPatients":
-                            FetchAllPatients();
-                           
+                            FetchAllPatients();                           
                             break;
                         case "SearchPatient":
-                            SearchPatient();
-                           
+                            SearchPatient();                           
                             break;
                         case "AddAppointment":
-                            AddAppointment();
-                            Console.WriteLine("Appointment  Added Successfully");
-                            
+                            AddAppointment();                                                     
                             break;
                         case "AddPrescription":
-                            AddPrescription();
-                            Console.WriteLine("Prescription  Added Successfully");
-                            
+                            AddPrescription();                                                      
                             break;
                         case "AddPatientNotes":
-                            AddPatientNotes();
-                            Console.WriteLine("Patient Notes  Added Successfully");
-                            
+                            AddPatientNotes();                     
                             break;
                         case "ViewAppointments":
-                            ViewAppoinments();
-                         
+                            ViewAppoinments();                         
                             break;
                         case "ViewPrescriptions":
-                            ViewPrescriptions();
-                           
+                            ViewPrescriptions();                          
                             break;
                         case "ViewPatientNotes":
-                            ViewPatientNotes();
-                           
+                            ViewPatientNotes();                          
                             break;
                         default:
                             Console.WriteLine("Unknown feature.");
@@ -226,14 +208,11 @@ namespace PRS
             List<User> users = userrepo.FetchAllUsers(filepath);
             Console.WriteLine("Following is the Users List");
             Console.WriteLine();
-            Console.WriteLine("-------------------------------------------------------");
-            Console.WriteLine("UserName " + "        |         " + " Enabled " + "       |         " + "UserType");
-            Console.WriteLine("-------------------------------------------------------");
+            Console.WriteLine("{0,-20} {1,-20} {2,-10}", "UserName", "Enabled", "UserType");
+            Console.WriteLine(new string('-', 50));           
             foreach (User user in users)
             {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(user.Username + "           |            " + user.Active + "       |         " + user.UserType);
-                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("{0,-20} {1,-20} {2,-10}", user.Username, user.Active, user.UserType);
             }
         }      
         public void AddUser()
@@ -303,6 +282,7 @@ namespace PRS
                 try
                 {
                     userrepo.WriteUsersToCsv(filepath, users);
+                    Console.WriteLine("Password Changed Successfully");
                 }
                 catch (Exception ex)
                 {
@@ -315,8 +295,7 @@ namespace PRS
             }
         }
         public void EnableUser()
-        {
-            // User usr = new User();
+        {           
             UserRepository userrepo = new UserRepository();
             var filepath = ConfigurationManager.AppSettings["userfilepath"];
             Console.WriteLine("Enter UserName");
@@ -325,12 +304,11 @@ namespace PRS
             User usr = users.Find(u => u.Username == Username);
             if (usr != null)
             {
-
                 try
                 {
-                    usr.Active = true;
-                    //userrepo.EnableuserAccount(Username, connectionstring);
+                    usr.Active = true;                    
                     userrepo.WriteUsersToCsv(filepath, users);
+                    Console.WriteLine("User Enabled Successfully");
                 }
                 catch (Exception ex)
                 {
@@ -355,7 +333,6 @@ namespace PRS
                 User usrfound = users.FirstOrDefault(u => u.Username == Username);
                 if (usrfound != null)
                 {
-
                     try
                     {
                         usrfound.Active = false;                        
@@ -387,10 +364,8 @@ namespace PRS
             User usrfound = users.FirstOrDefault(u => u.Username == Username);
             if (usrfound != null)
             {
-
                 try
-                {
-                    // usr.Username = Username;
+                {                   
                     Console.WriteLine("Select UserType");
                     Console.WriteLine("1. Admin");
                     Console.WriteLine("2. Doctor");
@@ -401,17 +376,15 @@ namespace PRS
                         case "1":
                             usrfound.UserType = "Admin";
                             break;
-
                         case "2":
                             usrfound.UserType = "Doctor";
                             break;
                         case "3":
                             usrfound.UserType = "Nurse";
                             break;
-
                     }
                     userrepo.WriteUsersToCsv(filepath, users);
-                    // userrepo.UpdateUserType(usr, connectionstring);
+                    Console.WriteLine("UserType Updated Successfully");                 
                 }
                 catch (Exception ex)
                 {
@@ -433,14 +406,11 @@ namespace PRS
             List<Patients> patients = patientrepo.FetchAllPatients(filepath);
             Console.WriteLine("Following is the Patients List");
             Console.WriteLine();
-            Console.WriteLine("-------------------------------------------------------");
-            Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       " + "Contact");
-            Console.WriteLine("-------------------------------------------------------");
+            Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", "FirstName", "Surname", "DateOfBirth", "PhoneNumber","NHSNumber","HospitalNumber");
+            Console.WriteLine(new string('-', 75));
             foreach (Patients patient in patients)
             {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth + "       |       " + patient.PhoneNumber);
-                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber,patient.HospitalNumber);              
             }
         }
         public void AddNewPatient()
@@ -460,6 +430,7 @@ namespace PRS
             patient.HospitalNumber = "PRS-" + DateTime.Now.ToString("yyyyMMdd");
             PatientRepository patientrepo = new PatientRepository();
             patientrepo.SavePatient(patient, filepath);
+            Console.WriteLine("Patient  Created Successfully");
         }
         public void SearchPatient()
         {
@@ -476,14 +447,11 @@ namespace PRS
             }
             else
             {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine("FirstName " + "        |         " + " Surname " + "       |       " + "DOB" + "       |       " + "Contact");
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine(patient.FirstName + "        |        " + patient.Surname + "       |         " + patient.DateOfBirth + "       |       " + patient.PhoneNumber);
-                Console.WriteLine("-------------------------------------------------------");
-
-
+                Console.WriteLine("Following is the Patient Detail");
+                Console.WriteLine();
+                Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", "FirstName", "Surname", "DateOfBirth", "PhoneNumber", "NHSNumber", "HospitalNumber");
+                Console.WriteLine(new string('-', 75));
+                Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber, patient.HospitalNumber);
             }
         }
         public void AddAppointment()
@@ -502,6 +470,7 @@ namespace PRS
             appoinment.DoctorName = Console.ReadLine();
             appoinment.Active = true;
             apprepo.SaveAppointment(appoinment, appointmentfilepath);
+            Console.WriteLine("Appointment  Added Successfully");
         }
 
         public void ViewAppoinments()
@@ -522,16 +491,14 @@ namespace PRS
             }
             else
             {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine("HospitalNumber " + "        |         " + " AppointmentDate " + "       |       " + "AppointmentTime" + "       |       " + "DoctorName");
-                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("Following are the Appointment Details");
+                Console.WriteLine();
+                Console.WriteLine("{0,-20} {1,-20} {2,-10} {3,-10} {4,-10}", "HospitalNumber", "AppointmentDate", "AppointmentTime", "DoctorName","Active");
+                Console.WriteLine(new string('-', 70));
                 foreach (var app in appointment)
                 {
-                    Console.WriteLine("-------------------------------------------------------");
-                    Console.WriteLine(app.HospitalNumber + "        |        " + app.AppointmentDate + "       |         " + app.AppointmentTime + "       |       " + app.DoctorName);
-                    Console.WriteLine("-------------------------------------------------------");
-                }
-
+                    Console.WriteLine("{0,-20} {1,-20} {2,-10} {3,-10} {4,-10}", app.HospitalNumber, app.AppointmentDate, app.AppointmentTime, app.DoctorName,app.Active);
+                }                
             }
 
         }
@@ -554,14 +521,13 @@ namespace PRS
             }
             else
             {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine("HospitalNumber " + "        |         " + " Medicine ");
-                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("Following are the Prescription Details");
+                Console.WriteLine();
+                Console.WriteLine("{0,-20} {1,-20}", "HospitalNumber", "Medicine");
+                Console.WriteLine(new string('-', 40));           
                 foreach (var app in prescription)
                 {
-                    Console.WriteLine("-------------------------------------------------------");
-                    Console.WriteLine(app.HospitalNumber + "        |        " + app.Medicine );
-                    Console.WriteLine("-------------------------------------------------------");
+                    Console.WriteLine("{0,-20} {1,-20}", app.HospitalNumber,app.Medicine);
                 }
 
             }
@@ -586,14 +552,13 @@ namespace PRS
             }
             else
             {
-                Console.WriteLine("-------------------------------------------------------");
-                Console.WriteLine("HospitalNumber " + "        |         " + " Notes ");
-                Console.WriteLine("-------------------------------------------------------");
+                Console.WriteLine("Following are the Patient Notes");
+                Console.WriteLine();
+                Console.WriteLine("{0,-20} {1,-20}", "HospitalNumber", "Notes");
+                Console.WriteLine(new string('-', 40));
                 foreach (var app in note)
                 {
-                    Console.WriteLine("-------------------------------------------------------");
-                    Console.WriteLine(app.HospitalNumber + "        |        " + app.Notes);
-                    Console.WriteLine("-------------------------------------------------------");
+                    Console.WriteLine("{0,-20} {1,-20}", app.HospitalNumber, app.Notes);
                 }
 
             }
@@ -610,6 +575,7 @@ namespace PRS
             Console.WriteLine("Enter Medicine Name");
             prescription.Medicine = Console.ReadLine();          
             apprepo.SavePatientPrescription(prescription, prescriptionfilepath);
+            Console.WriteLine("Prescription  Added Successfully");
         }
 
         public void AddPatientNotes()
@@ -623,6 +589,7 @@ namespace PRS
             Console.WriteLine("Enter Notes");
             note.Notes = Console.ReadLine();
             apprepo.SavePatientNotes(note, notesfilepath);
+            Console.WriteLine("Patient Notes  Added Successfully");
         }
 
         #endregion
