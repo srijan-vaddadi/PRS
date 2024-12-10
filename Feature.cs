@@ -1,4 +1,5 @@
-﻿using PRS.Repository;
+﻿using Microsoft.SqlServer.Server;
+using PRS.Repository;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -260,10 +261,8 @@ namespace PRS
             List<User> users = userrepo.FetchAllUsers(filepath);
             if (users.Find(u => u.Username == usr.Username) == null)
             {
-
                 Console.WriteLine("Enter Password");
-                usr.Password = Console.ReadLine();
-                // usr.Active = true;
+                usr.Password = Console.ReadLine();                
                 Console.WriteLine("Select UserType");
                 Console.WriteLine("1. Admin");
                 Console.WriteLine("2. Doctor");
@@ -274,14 +273,12 @@ namespace PRS
                     case "1":
                         usr.UserType = "Admin";
                         break;
-
                     case "2":
                         usr.UserType = "Doctor";
                         break;
                     case "3":
                         usr.UserType = "Nurse";
                         break;
-
                 }
                 usr.Active = true;
                 try
@@ -533,10 +530,29 @@ namespace PRS
             Appointment appoinment = new Appointment();
             Console.WriteLine("Enter Patient Hospital Number");
             appoinment.HospitalNumber = Console.ReadLine();
-            Console.WriteLine("Enter Appointment Date");
-            appoinment.AppointmentDate = Console.ReadLine();
-            Console.WriteLine("Enter Appointment Time");
-            appoinment.AppointmentTime = Console.ReadLine();
+            Console.WriteLine("Please enter the appointment date (format: yyyy-MM-dd):");
+            DateTime appointmentdate ;
+            if (DateTime.TryParseExact(Console.ReadLine(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out appointmentdate))
+            {
+                appoinment.AppointmentDate = appointmentdate.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                Console.WriteLine("Invalid date format. Please ensure the date is in the format yyyy-MM-dd.");
+                return;
+            }           
+            Console.WriteLine("Please enter the appointment time (format: HH:mm, 24-hour format):");
+            DateTime appointmenttime;
+            string format = "HH:mm"; // 24-hour format
+            if (DateTime.TryParseExact(Console.ReadLine(), format, null, System.Globalization.DateTimeStyles.None, out appointmenttime))
+            {
+                appoinment.AppointmentTime = appointmenttime.ToString(format);
+            }
+            else
+            {
+                Console.WriteLine("Invalid time format. Please ensure the time is in the format HH:mm (24-hour format).");
+                return;
+            }            
             Console.WriteLine("Enter Doctor Name");
             appoinment.DoctorName = Console.ReadLine();
             appoinment.Active = true;
