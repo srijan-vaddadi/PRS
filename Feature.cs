@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -36,21 +37,16 @@ namespace PRS
                             Console.ReadLine();
                             break;
                         case "FetchAllUsers":
-                            FetchAllUsers();
-                           
+                            FetchAllUsers();                          
                             break;
                         case "AddUser":
-                            AddUser();
-                            
-                            
+                            AddUser();                          
                             break;
                         case "ChangePassword":
-                            ChangePassword();
-                                                   
+                            ChangePassword();                                                   
                             break;
                         case "EnableUser":
-                            EnableUser();
-                                                     
+                            EnableUser();                            
                             break;
                         case "DisableUser":
                             DisableUser(user);                                                      
@@ -425,7 +421,7 @@ namespace PRS
             patient.FirstName = Console.ReadLine();
             Console.WriteLine("Enter Surname");
             patient.Surname = Console.ReadLine();
-            Console.WriteLine("Enter DOB");
+            Console.WriteLine("Enter DOB in (MM-DD-YYYY) format");
             patient.DateOfBirth = Console.ReadLine();
             Console.WriteLine("Enter PhoneNumber");
             patient.PhoneNumber = Console.ReadLine();
@@ -441,10 +437,52 @@ namespace PRS
             PatientRepository patientrepo = new PatientRepository();
             var filepath = ConfigurationManager.AppSettings["patientbasicfilepath"];
             List<Patients> patients = patientrepo.FetchAllPatients(filepath);
-            Console.WriteLine("Enter Hopital number of Patient");
-            string hospitalnumber = Console.ReadLine();
+            Patients patient;
+            Console.WriteLine("Select one of the below options that you want to search");
+            Console.WriteLine("1. Firstname");
+            Console.WriteLine("2. Surname");
+            Console.WriteLine("3. DOB");
+            Console.WriteLine("4. NHS Number");
+            Console.WriteLine("5. Hospital Number");
+            Console.WriteLine("6. Phone Number");
+            var choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    Console.WriteLine("Enter First Name of Patient");
+                    string firstname = Console.ReadLine();
+                    patient = patients.Find(u => u.FirstName.ToLower() == firstname.ToLower());
+                    break;
+                case "2":
+                    Console.WriteLine("Enter Surname of Patient");
+                    string surname = Console.ReadLine();
+                    patient = patients.Find(u => u.Surname.ToLower() == surname.ToLower());
+                    break;
+                case "3":
+                    Console.WriteLine("Enter Date of Birth(MM-DD-YYYY) of Patient");
+                    string dob = Console.ReadLine();
+                    patient = patients.Find(u => u.DateOfBirth.ToLower() == dob.ToLower());
+                    break;
+                case "4":
+                    Console.WriteLine("Enter NHS Number of Patient");
+                    string nhsnumber = Console.ReadLine();
+                    patient = patients.Find(u => u.NHSNumber.ToLower() == nhsnumber.ToLower());
+                    break;
+                case "5":
+                    Console.WriteLine("Enter Hospital Number of Patient");
+                    string hosnumber = Console.ReadLine();
+                    patient = patients.Find(u => u.HospitalNumber.ToLower() == hosnumber.ToLower());
+                    break;
+                case "6":
+                    Console.WriteLine("Enter Phone Number of Patient");
+                    string phonenumber = Console.ReadLine();
+                    patient = patients.Find(u => u.PhoneNumber == phonenumber);
+                    break;
+                default:
+                    return;
 
-            Patients patient = patients.Find(u => u.HospitalNumber == hospitalnumber);
+            }       
+            
             if (patient == null)
             {
                 Console.WriteLine("Patient not found");
