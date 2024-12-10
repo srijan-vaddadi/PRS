@@ -23,10 +23,8 @@ namespace PRS
                 new Feature(9,"FetchAllPatients"),
                 new Feature(10,"SearchPatient"),
                 new Feature(11,"ViewAppointments")
-
             };          
-            RunFeatures(features, user);
-           
+            RunFeatures(features, user);          
         }
     }
 }

@@ -138,7 +138,11 @@ namespace PRS
             {
                 Console.WriteLine("Enter Username:");
                 string username = Console.ReadLine();
-
+                if (!IsValidEmail(username))
+                {
+                    Console.WriteLine("Please enter a Valid Username(Email)");
+                    return;
+                }
                 User usr = users.Find(u => u.Username == username);
 
                 if (usr == null)

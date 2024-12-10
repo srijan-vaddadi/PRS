@@ -21,6 +21,11 @@ namespace PRS
                 }
                 featureId = Convert.ToInt32(Console.ReadLine());
                 Feature featurename = features.Find(f => f.FeatureId == featureId);
+                if(featurename==null)
+                {
+                    Console.WriteLine("Option that you selected not in the above list.Please select Valid option.");
+                    return;
+                }
                 Feature onjFeature = new Feature();
                 onjFeature.ExecuteFeature(featurename.FeatureName, user);
                 if (featureId != 1)
