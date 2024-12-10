@@ -106,7 +106,8 @@ namespace PRS
             Console.WriteLine("");
             Console.WriteLine("Select your choice");
             Console.WriteLine("1. Login");
-            Console.WriteLine("2. Exit");
+            Console.WriteLine("2. PasswordRecovery");
+            Console.WriteLine("3. Exit");
             var choice = Console.ReadLine();
           
             switch (choice)
@@ -115,6 +116,9 @@ namespace PRS
                     Login();
                     break;
                 case "2":
+                    PasswordRecovery();
+                    break;
+                case "3":
                     Exit();
                     break;
                 default:
@@ -124,7 +128,32 @@ namespace PRS
             
         }
 
-        public void Login()
+        public void PasswordRecovery()
+        {
+            var filePath = ConfigurationManager.AppSettings["userfilepath"];
+            List<User> users = new List<User>();
+            UserRepository userRepository = new UserRepository();
+            users = userRepository.FetchAllUsers(filePath);
+            Console.WriteLine("Enter Username:");
+            string username = Console.ReadLine();
+            if (!IsValidEmail(username))
+            {
+                Console.WriteLine("Please enter a Valid Username(Email)");
+                return;
+            }
+            User usr = users.Find(u => u.Username == username);
+            if (usr == null)
+            {
+                Console.WriteLine("User does not exist");
+            }
+            else
+            {
+                Console.WriteLine("Password of the user "+ username + " is "+ usr.Password);
+            }
+
+        }
+
+            public void Login()
         {
             var filePath = ConfigurationManager.AppSettings["userfilepath"];
             List<User> users = new List<User>();
