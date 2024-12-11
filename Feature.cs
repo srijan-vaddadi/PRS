@@ -68,7 +68,7 @@ namespace PRS
                             SearchPatient();                           
                             break;
                         case "AddAppointment":
-                            AddAppointment();                                                     
+                            AddAppointment(user);                                                     
                             break;
                         case "AddPrescription":
                             AddPrescription();                                                      
@@ -282,6 +282,9 @@ namespace PRS
                     case "3":
                         usr.UserType = "Nurse";
                         break;
+                    default:
+                        usr.UserType = "Admin";
+                        break;
                 }
                 usr.Active = true;
                 try
@@ -311,7 +314,7 @@ namespace PRS
             User usr = users.Find(u => u.Username == username);
             if (usr != null)
             {
-                Console.WriteLine("Enter new Username");
+                Console.WriteLine("Enter new Username(email address)");
                 usr.Username = Console.ReadLine();
                 Console.WriteLine("Enter new Password");
                 usr.Password = Console.ReadLine();
@@ -330,6 +333,9 @@ namespace PRS
                         break;
                     case "3":
                         usr.UserType = "Nurse";
+                        break;
+                    default:
+                        usr.UserType = "Admin";
                         break;
                 }
                 Console.WriteLine("Select below User Enabled/Disabled");
@@ -592,11 +598,10 @@ namespace PRS
                 Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber, patient.HospitalNumber);
             }
         }
-        public void AddAppointment()
+        public void AddAppointment(User user)
         {
             var appointmentfilepath = ConfigurationManager.AppSettings["patientappointmentsfilepath"];
-            PatientRepository apprepo = new PatientRepository();
-            //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
+            PatientRepository apprepo = new PatientRepository();            
             Appointment appoinment = new Appointment();
             Console.WriteLine("Enter Patient Hospital Number");
             appoinment.HospitalNumber = Console.ReadLine();
@@ -622,9 +627,18 @@ namespace PRS
             {
                 Console.WriteLine("Invalid time format. Please ensure the time is in the format HH:mm (24-hour format).");
                 return;
-            }            
-            Console.WriteLine("Enter Doctor Name");
-            appoinment.DoctorName = Console.ReadLine();
+            }
+            if (user.UserType == "Doctor")
+            {
+                //when user is a doctor we are assigning username as Doctorname               
+                appoinment.DoctorName = user.Username;
+            }
+            else
+            {
+                //when user is not a doctor we are asking user to enter doctorname
+                Console.WriteLine("Enter Doctor Name (email address) ");
+                appoinment.DoctorName = Console.ReadLine();
+            }
             appoinment.Active = true;
             apprepo.SaveAppointment(appoinment, appointmentfilepath);
             Console.WriteLine("Appointment  Added Successfully");
@@ -650,11 +664,11 @@ namespace PRS
             {
                 Console.WriteLine("Following are the Appointment Details");
                 Console.WriteLine();
-                Console.WriteLine("{0,-20} {1,-20} {2,-10} {3,-10} {4,-10}", "HospitalNumber", "AppointmentDate", "AppointmentTime", "DoctorName","Active");
-                Console.WriteLine(new string('-', 70));
+                Console.WriteLine("{0,-20} {1,-20} {2,-20} {3,-20} {4,-10}", "HospitalNumber", "AppointmentDate", "AppointmentTime", "DoctorName","Active");
+                Console.WriteLine(new string('-', 90));
                 foreach (var app in appointment)
                 {
-                    Console.WriteLine("{0,-20} {1,-20} {2,-10} {3,-10} {4,-10}", app.HospitalNumber, app.AppointmentDate, app.AppointmentTime, app.DoctorName,app.Active);
+                    Console.WriteLine("{0,-20} {1,-20} {2,-20} {3,-20} {4,-10}", app.HospitalNumber, app.AppointmentDate, app.AppointmentTime, app.DoctorName,app.Active);
                 }                
             }
 
