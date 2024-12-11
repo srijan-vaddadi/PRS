@@ -84,16 +84,16 @@ namespace PRS.Repository
 
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    var values = lines[i].Split(',');
-
+                    var values = lines[i].Split(',');            
                     var prescription = new Prescription
                     {
                         HospitalNumber = values[0],
-                        Medicine = values[1]
-
-
+                        Medicine = values[1],
+                        Dosage = values[2],
+                        Active=Convert.ToBoolean(values[3])
                     };
                     prescriptions.Add(prescription);
+              
                 }
            
             return prescriptions;

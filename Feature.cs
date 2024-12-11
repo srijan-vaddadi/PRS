@@ -45,6 +45,9 @@ namespace PRS
                             break;
                         case "UpdateUser":
                             UpdateUser();
+                            break;                            
+                        case "ChangeUsername":
+                            ChangeUsername();
                             break;
                         case "ChangePassword":
                             ChangePassword();                                                   
@@ -58,6 +61,7 @@ namespace PRS
                         case "UpdateUserType":
                             UpdateUserType();                                                      
                             break;
+                            
                         case "AddNewPatient":
                             AddNewPatient();                                                     
                             break;
@@ -73,6 +77,9 @@ namespace PRS
                         case "AddPrescription":
                             AddPrescription();                                                      
                             break;
+                        case "DeactivatePrescription":
+                            DeactivatePrescription();
+                            break;                            
                         case "AddPatientNotes":
                             AddPatientNotes();                     
                             break;
@@ -153,8 +160,31 @@ namespace PRS
             else
             {
                 Console.WriteLine("Password of the user "+ username + " is "+ usr.Password);
+                
             }
+            Console.WriteLine("");
+            Console.WriteLine("Select your choice");
+            Console.WriteLine("1. Login");
+            Console.WriteLine("2. PasswordRecovery");
+            Console.WriteLine("3. Exit");
+            var choice = Console.ReadLine();
 
+            switch (choice)
+            {
+                case "1":
+                    Login();
+                    break;
+                case "2":
+                    PasswordRecovery();
+                    break;
+                case "3":
+                    Exit();
+                    break;
+                default:
+                    Console.WriteLine("Please select valid choice");
+                    return;
+
+            }
         }
 
             public void Login()
@@ -297,6 +327,32 @@ namespace PRS
             else
             {
                 Console.WriteLine("User " + usr.Username + " already exists");
+            }
+        }
+
+        public void ChangeUsername()
+        {
+            UserRepository userrepo = new UserRepository();
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];
+            Console.WriteLine("Enter current UserName");
+            string username = Console.ReadLine();
+            if (!IsValidEmail(username))
+            {
+                Console.WriteLine("Email Address that you entered in Invalid");
+                return;
+            }
+            List<User> users = userrepo.FetchAllUsers(filepath);
+            User usr = users.Find(u => u.Username == username);
+            if (usr != null)
+            {
+                Console.WriteLine("Enter new Username(email address)");
+                usr.Username = Console.ReadLine();
+                userrepo.WriteUsersToCsv(filepath, users);
+                Console.WriteLine("Username Updated");
+            }
+            else
+            {
+                Console.WriteLine("User " + usr.Username + " doesn't exist.");
             }
         }
         public void UpdateUser()
@@ -581,6 +637,7 @@ namespace PRS
                     patient = patients.Find(u => u.PhoneNumber == phonenumber);
                     break;
                 default:
+                    Console.WriteLine("Please select a valid option");
                     return;
 
             }       
@@ -682,7 +739,7 @@ namespace PRS
             Console.WriteLine("Enter Patient Hospital Number");
             string patientnumber = Console.ReadLine();
             List<Prescription> prescription = new List<Prescription>();
-            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber).ToList())
+            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber && u.Active==true).ToList())
             {
                 prescription.Add(app);
             }
@@ -694,17 +751,44 @@ namespace PRS
             {
                 Console.WriteLine("Following are the Prescription Details");
                 Console.WriteLine();
-                Console.WriteLine("{0,-20} {1,-20}", "HospitalNumber", "Medicine");
-                Console.WriteLine(new string('-', 40));           
+                Console.WriteLine("{0,-20} {1,-20} {2,-10}", "HospitalNumber", "Medicine","Dosage");
+                Console.WriteLine(new string('-', 50));           
                 foreach (var app in prescription)
                 {
-                    Console.WriteLine("{0,-20} {1,-20}", app.HospitalNumber,app.Medicine);
+                    Console.WriteLine("{0,-20} {1,-20} {2,-10}", app.HospitalNumber,app.Medicine,app.Dosage);
                 }
 
             }
 
         }
+        public void DeactivatePrescription()
+        {
+            var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            List<Prescription> prescriptions = apprepo.FetchPrescriptions(prescriptionfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            Console.WriteLine("Enter Medicine to deactivate");
+            string medicine= Console.ReadLine();
+            List<Prescription> prescription = new List<Prescription>();
+            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.Medicine==medicine).ToList())
+            {
+                prescription.Add(app);
+            }
+            if (prescription.Count == 0)
+            {
+                Console.WriteLine("Please enter valid Patient Hospital number or medicine");
+            }
+            else
+            {
+                foreach (var app in prescription)
+                {
+                    app.Active = false;
+                }
+                apprepo.WritePrescriptionsToCsv(prescriptionfilepath, prescriptions);
+            }
 
+        }
         public void ViewPatientNotes()
         {
             PatientRepository apprepo = new PatientRepository();
@@ -739,12 +823,15 @@ namespace PRS
         {
             var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
             PatientRepository apprepo = new PatientRepository();
-            //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
+       
             Prescription prescription = new Prescription();
             Console.WriteLine("Enter Patient Hospital Number");
             prescription.HospitalNumber = Console.ReadLine();
             Console.WriteLine("Enter Medicine Name");
-            prescription.Medicine = Console.ReadLine();          
+            prescription.Medicine = Console.ReadLine();
+            Console.WriteLine("Enter Medicine Dosage");
+            prescription.Dosage = Console.ReadLine();
+            prescription.Active = true;
             apprepo.SavePatientPrescription(prescription, prescriptionfilepath);
             Console.WriteLine("Prescription  Added Successfully");
         }

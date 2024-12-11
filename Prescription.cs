@@ -10,5 +10,7 @@ namespace PRS
     {
         public string HospitalNumber { get; set; }
         public string Medicine { get; set; }
+        public string Dosage { get;set; }
+        public bool Active {  get; set; }
     }
 }
