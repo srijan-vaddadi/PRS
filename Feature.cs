@@ -43,6 +43,9 @@ namespace PRS
                         case "AddUser":
                             AddUser();                          
                             break;
+                        case "UpdateUser":
+                            UpdateUser();
+                            break;
                         case "ChangePassword":
                             ChangePassword();                                                   
                             break;
@@ -292,8 +295,75 @@ namespace PRS
             {
                 Console.WriteLine("User " + usr.Username + " already exists");
             }
-        }    
-        public void ChangePassword()
+        }
+        public void UpdateUser()
+        {
+            UserRepository userrepo = new UserRepository();
+            var filepath = ConfigurationManager.AppSettings["userfilepath"];           
+            Console.WriteLine("Enter current UserName");
+            string username = Console.ReadLine();
+            if (!IsValidEmail(username))
+            {
+                Console.WriteLine("Email Address that you entered in Invalid");
+                return;
+            }
+            List<User> users = userrepo.FetchAllUsers(filepath);
+            User usr = users.Find(u => u.Username == username);
+            if (usr != null)
+            {
+                Console.WriteLine("Enter new Username");
+                usr.Username = Console.ReadLine();
+                Console.WriteLine("Enter new Password");
+                usr.Password = Console.ReadLine();
+                Console.WriteLine("Select new UserType");
+                Console.WriteLine("1. Admin");
+                Console.WriteLine("2. Doctor");
+                Console.WriteLine("3. Nurse");
+                string userType = Console.ReadLine();
+                switch (userType)
+                {
+                    case "1":
+                        usr.UserType = "Admin";
+                        break;
+                    case "2":
+                        usr.UserType = "Doctor";
+                        break;
+                    case "3":
+                        usr.UserType = "Nurse";
+                        break;
+                }
+                Console.WriteLine("Select below User Enabled/Disabled");
+                Console.WriteLine("1. Enabled");
+                Console.WriteLine("2. Disabled");
+                string enableordisable = Console.ReadLine();
+                switch (enableordisable)
+                {
+                    case "1":
+                        usr.Active = true;
+                        break;
+                    case "2":
+                        usr.Active = false;
+                        break;
+                    default:
+                        usr.Active = true;
+                        break;
+                }             
+                try
+                {
+                    userrepo.WriteUsersToCsv(filepath, users);
+                    Console.WriteLine("User Updated");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Unable to Change User Password. Please check the exception. " + ex.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("User " + usr.Username + " doesn't exist.");
+            }
+        }
+            public void ChangePassword()
         {
             UserRepository userrepo = new UserRepository();
             var filepath = ConfigurationManager.AppSettings["userfilepath"];
