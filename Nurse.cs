@@ -12,9 +12,9 @@ namespace PRS
         public override void DisplayFeatures(User user)
         {          
             List<Feature> features = new List<Feature>{
-                new Feature(1, "Logout"),
+                new Feature(1,"Logout"),
                 new Feature(2,"AddNewPatient"),
-                new Feature(3,"FetchAllPatients"),
+                new Feature(3,"ViewAllPatients"),
                 new Feature(4,"SearchPatient"),
                 new Feature(5,"AddAppointment"),
                 new Feature(6,"AddPrescription"),

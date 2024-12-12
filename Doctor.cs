@@ -14,18 +14,19 @@ namespace PRS
             List<Feature> features = new List<Feature>{
                 new Feature(1, "Logout"),
                 new Feature(2,"AddNewPatient"),
-                new Feature(3,"FetchAllPatients"),
+                new Feature(3,"ViewAllPatients"),
                 new Feature(4,"SearchPatient"),
                 new Feature(5,"AddAppointment"),
-                new Feature(6,"AddPrescription"),
-                new Feature(7,"AddPatientNotes"),
-                new Feature(8,"ViewAppointments"),
-                new Feature(9,"ViewPrescriptions"),
-                new Feature(10,"ViewPatientNotes"),
-                new Feature(11,"DeactivatePrescription"),
-                new Feature(12,"DeactivateNote"),
-                new Feature(13,"AlterNote"),
-                new Feature(14,"AlterDosage")
+                new Feature(6,"CancelAppointment"),
+                new Feature(7,"AddPrescription"),
+                new Feature(8,"AddPatientNotes"),
+                new Feature(9,"ViewAppointments"),
+                new Feature(10,"ViewPrescriptions"),
+                new Feature(11,"ViewPatientNotes"),
+                new Feature(12,"DeactivatePrescription"),
+                new Feature(13,"DeactivateNote"),
+                new Feature(14,"AlterNote"),
+                new Feature(15,"AlterDosage")
             };
            RunFeatures(features,user);
         }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
+using System.Numerics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace PRS
                             Logout();
                             Console.ReadLine();
                             break;
-                        case "FetchAllUsers":
+                        case "ViewAllUsers":
                             FetchAllUsers();                          
                             break;
                         case "AddUser":
@@ -65,7 +66,7 @@ namespace PRS
                         case "AddNewPatient":
                             AddNewPatient();                                                     
                             break;
-                        case "FetchAllPatients":
+                        case "ViewAllPatients":
                             FetchAllPatients();                           
                             break;
                         case "SearchPatient":
@@ -100,6 +101,9 @@ namespace PRS
                             break;
                         case "AlterDosage":
                             AlterDosage();
+                            break;
+                        case "CancelAppointment":
+                            CancelAppointment(user);
                             break;
                         default:
                             Console.WriteLine("Unknown feature.");
@@ -182,7 +186,11 @@ namespace PRS
                         count++;
                         Console.WriteLine("Incorrect Answer. Attempts remaining "+(maxlimit-count));
                        
-                    }                    
+                    }
+                    else 
+                    {
+                        break;
+                    }
                 }
                 if(count==3)
                 {
@@ -227,7 +235,7 @@ namespace PRS
             }
         }
         // Asks user for login details are presents them with the option to select the features they are allowed to use
-            public void Login()
+        public void Login()
         {
             var filePath = ConfigurationManager.AppSettings["userfilepath"];
             List<User> users = new List<User>();
@@ -936,7 +944,7 @@ namespace PRS
                 apprepo.WritePatientNotesToCsv(notefilepath, notes);
             }
         }
-
+        // Function to change the content of a note
         public void AlterPatientNote()
         {
             var notefilepath = ConfigurationManager.AppSettings["patientnotesfilepath"];
@@ -966,7 +974,7 @@ namespace PRS
                 Console.WriteLine("The note is successfully changed");
             }
         }
-
+        // Function to change the dosage of a medicine
         public void AlterDosage()
         {
             var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
@@ -995,6 +1003,47 @@ namespace PRS
                 apprepo.WritePrescriptionsToCsv(prescriptionfilepath, prescriptions);
                 Console.WriteLine("Dosage is successfully changed");
             }
+        }
+        // Function to cancel an appointment
+        public void CancelAppointment(User user)
+        {
+            var appointmentfilepath = ConfigurationManager.AppSettings["patientappointmentsfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            List<Appointment> appointments = apprepo.FetchAllAppointments(appointmentfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            Console.WriteLine("Please enter the appointment date (format: yyyy-MM-dd):");
+            string date = Console.ReadLine();
+            Console.WriteLine("Please enter the appointment time (format: HH:mm, 24-hour format):");
+            string time = Console.ReadLine();
+            if (user.UserType == "Doctor")
+            {
+                string doctor = user.Username;
+            }
+            else
+            {
+                Console.WriteLine("Enter Doctor Name (email address) ");
+                string doctor = Console.ReadLine();
+            }
+
+            List<Appointment> appointment = new List<Appointment>();
+            foreach (Appointment app in appointments.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.AppointmentDate == date && u.AppointmentTime == time && u.DoctorName == doctor).ToList())
+            {
+                appointment.Add(app);
+            }
+            if (appointment.Count == 0)
+            {
+                Console.WriteLine("Please enter valid Patient Hospital number or medicine");
+            }
+            else
+            {
+                foreach (var app in appointment)
+                {
+                    app.Active = false;
+                }
+                apprepo.WriteAppointmentsToCsv(appointmentfilepath, appointments);
+            }
+
         }
 
         #endregion
