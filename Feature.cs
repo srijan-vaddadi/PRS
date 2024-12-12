@@ -837,7 +837,7 @@ namespace PRS
             Console.WriteLine("Enter Notes");
             note.Notes = Console.ReadLine();
             Console.WriteLine("Enter subject");
-            note.Notes = Console.ReadLine();
+            note.Subject = Console.ReadLine();
             note.Active = true;
             apprepo.SavePatientNotes(note, notesfilepath);
             Console.WriteLine("Patient Notes  Added Successfully");
