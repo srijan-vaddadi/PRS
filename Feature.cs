@@ -800,11 +800,11 @@ namespace PRS
             {
                 Console.WriteLine("Following are the Patient Notes");
                 Console.WriteLine();
-                Console.WriteLine("{0,-20} {1,-20}", "HospitalNumber", "Notes");
-                Console.WriteLine(new string('-', 40));
+                Console.WriteLine("{0,-20} {1,-20} {1,-20}", "HospitalNumber", "Subject", "Notes");
+                Console.WriteLine(new string('-', 60));
                 foreach (var app in note)
                 {
-                    Console.WriteLine("{0,-20} {1,-20}", app.HospitalNumber, app.Notes);
+                    Console.WriteLine("{0,-20} {1,-20} {1,-20}", app.HospitalNumber, app.Subject, app.Notes);
                 }
 
             }
