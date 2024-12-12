@@ -1016,14 +1016,15 @@ namespace PRS
             string date = Console.ReadLine();
             Console.WriteLine("Please enter the appointment time (format: HH:mm, 24-hour format):");
             string time = Console.ReadLine();
+            string doctor;
             if (user.UserType == "Doctor")
             {
-                string doctor = user.Username;
+                doctor = user.Username;
             }
             else
             {
                 Console.WriteLine("Enter Doctor Name (email address) ");
-                string doctor = Console.ReadLine();
+                doctor = Console.ReadLine();
             }
 
             List<Appointment> appointment = new List<Appointment>();
