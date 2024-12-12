@@ -19,7 +19,12 @@ namespace PRS
                 {
                     Console.WriteLine(feature.FeatureId + ". " + feature.FeatureName);
                 }
-                featureId = Convert.ToInt32(Console.ReadLine());
+                string id = Console.ReadLine();
+                if(string.IsNullOrEmpty(id))
+                {
+                    Console.WriteLine("Please select valid option");
+                }
+                featureId = Convert.ToInt32(id);
                 Feature featurename = features.Find(f => f.FeatureId == featureId);
                 if(featurename==null)
                 {

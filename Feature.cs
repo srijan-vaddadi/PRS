@@ -716,7 +716,7 @@ namespace PRS
             }
             appoinment.Active = true;
             apprepo.SaveAppointment(appoinment, appointmentfilepath);
-            Console.WriteLine("Appointment  Added Successfully");
+            
         }
         // Fetches all the appointments linked to a patient
         public void ViewAppoinments()

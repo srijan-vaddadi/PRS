@@ -20,9 +20,18 @@ namespace PRS.Repository
         }
         public void SaveAppointment(Appointment appointment, string filepath)
         {
-            var appointments = FetchAllAppointments(filepath);          
-            appointments.Add(appointment);
-            WriteAppointmentsToCsv(filepath, appointments);
+            var appointments = FetchAllAppointments(filepath);  
+            Appointment app = appointments.Find(u => u.DoctorName==appointment.DoctorName && u.AppointmentDate==appointment.AppointmentDate && u.AppointmentTime==appointment.AppointmentTime && u.Active==true);
+            if (app == null)
+            {
+                appointments.Add(appointment);
+                WriteAppointmentsToCsv(filepath, appointments);
+                Console.WriteLine("Appointment  Added Successfully");
+            }
+          else
+            {
+                Console.WriteLine("Appointment Already Exists");
+            }
         }
         public void SavePatientPrescription(Prescription prescription, string filepath)
         {
