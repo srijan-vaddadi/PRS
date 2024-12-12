@@ -160,6 +160,7 @@ namespace PRS
                 Console.WriteLine("Please enter a Valid Username(Email)");
                 return;
             }
+
             User usr = users.Find(u => u.Username == username);
             if (usr == null)
             {
@@ -167,9 +168,37 @@ namespace PRS
             }
             else
             {
-                Console.WriteLine("Password of the user "+ username + " is "+ usr.Password);
-                
+                int count = 0;
+                int maxlimit = 3;
+                for (int i = 1; i <= maxlimit; i++)
+                {
+                    Console.WriteLine("Enter User First School");
+                    string firstSchool = Console.ReadLine();
+                    if (usr.FirstSchool.ToLower() != firstSchool.ToLower())
+                    {
+                        count++;
+                        Console.WriteLine("Incorrect Answer. Attempts remaining "+(maxlimit-count));
+                       
+                    }                    
+                }
+                if(count==3)
+                {
+                    usr.Active = false;
+                    userRepository.WriteUsersToCsv(filePath, users);
+                    Console.WriteLine("User disabled due to 3 unsuccessful attempts");
+                }
+                else
+                {
+                    Console.WriteLine("Password of the user " + username + " is " + usr.Password);
+                }
+            
+           
             }
+            //else
+            //{
+            //    Console.WriteLine("Password of the user "+ username + " is "+ usr.Password);
+                
+            //}
             Console.WriteLine("");
             Console.WriteLine("Select your choice");
             Console.WriteLine("1. Login");
@@ -326,6 +355,8 @@ namespace PRS
                         usr.UserType = "Admin";
                         break;
                 }
+                Console.WriteLine("Enter First School");
+                usr.FirstSchool = Console.ReadLine();
                 usr.Active = true;
                 try
                 {
@@ -803,11 +834,11 @@ namespace PRS
             {
                 Console.WriteLine("Following are the Patient Notes");
                 Console.WriteLine();
-                Console.WriteLine("{0,-20} {1,-20} {1,-20}", "HospitalNumber", "Subject", "Notes");
-                Console.WriteLine(new string('-', 60));
+                Console.WriteLine("{0,-20} {1,-10} {2,-20}", "HospitalNumber", "Subject", "Notes" );
+                Console.WriteLine(new string('-', 50));
                 foreach (var app in note)
                 {
-                    Console.WriteLine("{0,-20} {1,-20} {1,-20}", app.HospitalNumber, app.Subject, app.Notes);
+                    Console.WriteLine("{0,-20} {1,-10} {2,-20}", app.HospitalNumber, app.Subject, app.Notes );
                 }
 
             }

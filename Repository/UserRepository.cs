@@ -36,7 +36,8 @@ namespace PRS.Repository
                         Username = values[0],
                         Password = values[1],
                         UserType =values[2],
-                        Active = Convert.ToBoolean(values[3])
+                        FirstSchool = values[3],
+                        Active = Convert.ToBoolean(values[4])
                        
 
                     };
@@ -85,7 +86,7 @@ namespace PRS.Repository
         public void WriteUsersToCsv(string filePath, List<User> users) 
         { using (StreamWriter writer = new StreamWriter(filePath)) 
             { foreach (var user in users) 
-                { writer.WriteLine($"{user.Username},{user.Password},{user.UserType},{user.Active}");}
+                { writer.WriteLine($"{user.Username},{user.Password},{user.UserType},{user.FirstSchool},{user.Active}");}
             } 
         }     
     }
