@@ -95,6 +95,9 @@ namespace PRS
                         case "DeactivateNote":
                             DeactivatePatientNote();
                             break;
+                        case "AlterNote":
+                            AlterPatientNote();
+                            break;
                         default:
                             Console.WriteLine("Unknown feature.");
                             break;
@@ -800,11 +803,11 @@ namespace PRS
             {
                 Console.WriteLine("Following are the Patient Notes");
                 Console.WriteLine();
-                Console.WriteLine("{0,-20} {1,-20}", "HospitalNumber", "Notes");
-                Console.WriteLine(new string('-', 40));
+                Console.WriteLine("{0,-20} {1,-20} {1,-20}", "HospitalNumber", "Subject", "Notes");
+                Console.WriteLine(new string('-', 60));
                 foreach (var app in note)
                 {
-                    Console.WriteLine("{0,-20} {1,-20}", app.HospitalNumber, app.Notes);
+                    Console.WriteLine("{0,-20} {1,-20} {1,-20}", app.HospitalNumber, app.Subject, app.Notes);
                 }
 
             }
@@ -888,13 +891,42 @@ namespace PRS
             }
             if (note.Count == 0)
             {
-                Console.WriteLine("Please enter valid Patient Hospital number or subjet");
+                Console.WriteLine("Please enter valid Patient Hospital number or subject");
             }
             else
             {
                 foreach (var app in note)
                 {
                     app.Active = false;
+                }
+                apprepo.WritePatientNotesToCsv(notefilepath, notes);
+            }
+        }
+
+        public void AlterPatientNote()
+        {
+            var notefilepath = ConfigurationManager.AppSettings["patientnotesfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            List<PatientNotes> notes = apprepo.FetchPatientNotes(notefilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            Console.WriteLine("Enter Subject to change");
+            string subject = Console.ReadLine();
+            List<PatientNotes> note = new List<PatientNotes>();
+            foreach (PatientNotes app in notes.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.Subject == subject).ToList())
+            {
+                note.Add(app);
+            }
+            if (note.Count == 0)
+            {
+                Console.WriteLine("Please enter valid Patient Hospital number or subject");
+            }
+            else
+            {
+                foreach (var app in note)
+                {
+                    Console.WriteLine("Enter the new note");
+                    app.Notes = Console.ReadLine();
                 }
                 apprepo.WritePatientNotesToCsv(notefilepath, notes);
             }

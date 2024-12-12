@@ -23,7 +23,8 @@ namespace PRS
                 new Feature(9,"ViewPrescriptions"),
                 new Feature(10,"ViewPatientNotes"),
                 new Feature(11,"DeactivatePrescription"),
-                new Feature(12,"DeactivateNote")
+                new Feature(12,"DeactivateNote"),
+                new Feature(13,"AlterNote")
             };
           RunFeatures(features,user);          
         }
