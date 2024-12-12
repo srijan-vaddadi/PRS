@@ -98,6 +98,9 @@ namespace PRS
                         case "AlterNote":
                             AlterPatientNote();
                             break;
+                        case "AlterDosage":
+                            AlterDosage();
+                            break;
                         default:
                             Console.WriteLine("Unknown feature.");
                             break;
@@ -929,6 +932,37 @@ namespace PRS
                     app.Notes = Console.ReadLine();
                 }
                 apprepo.WritePatientNotesToCsv(notefilepath, notes);
+                Console.WriteLine("The note is successfully changed");
+            }
+        }
+
+        public void AlterDosage()
+        {
+            var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            List<Prescription> prescriptions = apprepo.FetchPrescriptions(prescriptionfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            Console.WriteLine("Enter Medicine to change prescription");
+            string medicine = Console.ReadLine();
+            List<Prescription> prescription = new List<Prescription>();
+            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.Medicine == medicine).ToList())
+            {
+                prescription.Add(app);
+            }
+            if (prescription.Count == 0)
+            {
+                Console.WriteLine("Please enter valid Patient Hospital number or medicine");
+            }
+            else
+            {
+                foreach (var app in prescription)
+                {
+                    Console.WriteLine("Enter new dosage");
+                    app.Dosage = Console.ReadLine();
+                }
+                apprepo.WritePrescriptionsToCsv(prescriptionfilepath, prescriptions);
+                Console.WriteLine("Dosage is successfully changed");
             }
         }
 
