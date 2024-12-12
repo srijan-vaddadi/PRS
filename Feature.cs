@@ -28,6 +28,7 @@ namespace PRS
             {
                 if (selectedFeature != null)
                 {
+                    // Calls the function the user has inputted is called after logging in
                     switch (selectedFeature)
                     {
                         case "Login":
@@ -61,7 +62,6 @@ namespace PRS
                         case "UpdateUserType":
                             UpdateUserType();                                                      
                             break;
-                            
                         case "AddNewPatient":
                             AddNewPatient();                                                     
                             break;
@@ -69,7 +69,7 @@ namespace PRS
                             FetchAllPatients();                           
                             break;
                         case "SearchPatient":
-                            SearchPatient();                           
+                            SearchPatient();                            
                             break;
                         case "AddAppointment":
                             AddAppointment(user);                                                     
@@ -92,6 +92,9 @@ namespace PRS
                         case "ViewPatientNotes":
                             ViewPatientNotes();                          
                             break;
+                        case "DeactivateNote":
+                            DeactivatePatientNote();
+                            break;
                         default:
                             Console.WriteLine("Unknown feature.");
                             break;
@@ -110,6 +113,7 @@ namespace PRS
         }
 
         #region User
+        // Logout function asks the user the starting questions
         public void Logout()
         {
             Console.WriteLine("LoggedOut Successfully");
@@ -138,7 +142,7 @@ namespace PRS
             }
             
         }
-
+        // Password recovery asks for a username and returns matching the password
         public void PasswordRecovery()
         {
             var filePath = ConfigurationManager.AppSettings["userfilepath"];
@@ -186,7 +190,7 @@ namespace PRS
 
             }
         }
-
+        // Asks user for login details are presents them with the option to select the features they are allowed to use
             public void Login()
         {
             var filePath = ConfigurationManager.AppSettings["userfilepath"];
@@ -246,7 +250,7 @@ namespace PRS
                 }
             }
         }
-
+        // checks for a valid email input
         bool IsValidEmail(string email)
         {
             try
@@ -259,11 +263,12 @@ namespace PRS
                 return false;
             }
         }
-
+        // To end the program neatly
         public void Exit()
         {       
             return;
         }
+        // Fetches and displays all the staff members from the csv and returns them in a neat way
         public void FetchAllUsers()
         {
             UserRepository userrepo = new UserRepository();
@@ -278,6 +283,7 @@ namespace PRS
                 Console.WriteLine("{0,-20} {1,-20} {2,-10}", user.Username, user.Active, user.UserType);
             }
         }      
+        // Asks the user all the neccessary details for a new user to be added
         public void AddUser()
         {
             UserRepository userrepo = new UserRepository();
@@ -329,7 +335,7 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " already exists");
             }
         }
-
+        // changes a users username and checks the new username is an email address
         public void ChangeUsername()
         {
             UserRepository userrepo = new UserRepository();
@@ -355,6 +361,7 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " doesn't exist.");
             }
         }
+        // a function where any detail of a user can be changed at once
         public void UpdateUser()
         {
             UserRepository userrepo = new UserRepository();
@@ -452,6 +459,7 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " doesn't exist.");
             }
         }
+        // Sets a user to be enabled so that they can login 
         public void EnableUser()
         {           
             UserRepository userrepo = new UserRepository();
@@ -478,13 +486,13 @@ namespace PRS
                 Console.WriteLine("User " + Username + " doesn't exist.");
             }
         }
+        // Disables a user so that they can not login and does not allow an admin to disable themselves
         public void DisableUser(User user)
         {
             UserRepository userrepo = new UserRepository();
             var filepath = ConfigurationManager.AppSettings["userfilepath"];
             Console.WriteLine("Enter UserName");
             string Username = Console.ReadLine();
-            //Admin user cannot disable own account
             if (Username != user.Username)
             {
                 List<User> users = userrepo.FetchAllUsers(filepath);
@@ -512,6 +520,7 @@ namespace PRS
                 Console.WriteLine("Admin user cannot disable own account");
             }
         }
+        // Function change the job of a user
         public void UpdateUserType()
         {
             UserRepository userrepo = new UserRepository();
@@ -557,6 +566,7 @@ namespace PRS
         #endregion
 
         #region Patient
+        // A function that gets all the patients in the database and displays them neatly
         public void FetchAllPatients()
         {
             PatientRepository patientrepo = new PatientRepository();
@@ -571,6 +581,7 @@ namespace PRS
                 Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber,patient.HospitalNumber);              
             }
         }
+        // The function to add a new patient into the database
         public void AddNewPatient()
         {
             Patients patient = new Patients();
@@ -590,6 +601,7 @@ namespace PRS
             patientrepo.SavePatient(patient, filepath);
             Console.WriteLine("Patient  Created Successfully");
         }
+        // Allows a user to search for a patient in using whichever attribute they want and displays the search result neatly
         public void SearchPatient()
         {
             PatientRepository patientrepo = new PatientRepository();
@@ -655,6 +667,7 @@ namespace PRS
                 Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber, patient.HospitalNumber);
             }
         }
+        // The function to add an appointment which changes to depending on whether it is called by a doctor or nurse
         public void AddAppointment(User user)
         {
             var appointmentfilepath = ConfigurationManager.AppSettings["patientappointmentsfilepath"];
@@ -675,7 +688,7 @@ namespace PRS
             }           
             Console.WriteLine("Please enter the appointment time (format: HH:mm, 24-hour format):");
             DateTime appointmenttime;
-            string format = "HH:mm"; // 24-hour format
+            string format = "HH:mm";
             if (DateTime.TryParseExact(Console.ReadLine(), format, null, System.Globalization.DateTimeStyles.None, out appointmenttime))
             {
                 appoinment.AppointmentTime = appointmenttime.ToString(format);
@@ -687,12 +700,10 @@ namespace PRS
             }
             if (user.UserType == "Doctor")
             {
-                //when user is a doctor we are assigning username as Doctorname               
                 appoinment.DoctorName = user.Username;
             }
             else
             {
-                //when user is not a doctor we are asking user to enter doctorname
                 Console.WriteLine("Enter Doctor Name (email address) ");
                 appoinment.DoctorName = Console.ReadLine();
             }
@@ -700,7 +711,7 @@ namespace PRS
             apprepo.SaveAppointment(appoinment, appointmentfilepath);
             Console.WriteLine("Appointment  Added Successfully");
         }
-
+        // Fetches all the appointments linked to a patient
         public void ViewAppoinments()
         {
             PatientRepository apprepo = new PatientRepository();
@@ -730,7 +741,7 @@ namespace PRS
             }
 
         }
-
+        // fetches all the prescriptions for a patient
         public void ViewPrescriptions()
         {
             PatientRepository apprepo = new PatientRepository();
@@ -761,34 +772,7 @@ namespace PRS
             }
 
         }
-        public void DeactivatePrescription()
-        {
-            var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
-            PatientRepository apprepo = new PatientRepository();
-            List<Prescription> prescriptions = apprepo.FetchPrescriptions(prescriptionfilepath);
-            Console.WriteLine("Enter Patient Hospital Number");
-            string patientnumber = Console.ReadLine();
-            Console.WriteLine("Enter Medicine to deactivate");
-            string medicine= Console.ReadLine();
-            List<Prescription> prescription = new List<Prescription>();
-            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.Medicine==medicine).ToList())
-            {
-                prescription.Add(app);
-            }
-            if (prescription.Count == 0)
-            {
-                Console.WriteLine("Please enter valid Patient Hospital number or medicine");
-            }
-            else
-            {
-                foreach (var app in prescription)
-                {
-                    app.Active = false;
-                }
-                apprepo.WritePrescriptionsToCsv(prescriptionfilepath, prescriptions);
-            }
-
-        }
+        // Neatly prints all the notes for a patient
         public void ViewPatientNotes()
         {
             PatientRepository apprepo = new PatientRepository();
@@ -819,11 +803,11 @@ namespace PRS
             }
 
         }
+        // Adds a prescription to a patient
         public void AddPrescription()
         {
             var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
             PatientRepository apprepo = new PatientRepository();
-       
             Prescription prescription = new Prescription();
             Console.WriteLine("Enter Patient Hospital Number");
             prescription.HospitalNumber = Console.ReadLine();
@@ -835,19 +819,78 @@ namespace PRS
             apprepo.SavePatientPrescription(prescription, prescriptionfilepath);
             Console.WriteLine("Prescription  Added Successfully");
         }
-
+        // Adds a note to a patient
         public void AddPatientNotes()
         {
             var notesfilepath = ConfigurationManager.AppSettings["patientnotesfilepath"];
             PatientRepository apprepo = new PatientRepository();
-            //List<Appointment> appointments= apprepo.FetchAllAppointments(appointmentfilepath);
             PatientNotes note = new PatientNotes();
             Console.WriteLine("Enter Patient Hospital Number");
             note.HospitalNumber = Console.ReadLine();
             Console.WriteLine("Enter Notes");
             note.Notes = Console.ReadLine();
+            Console.WriteLine("Enter subject");
+            note.Notes = Console.ReadLine();
+            note.Active = true;
             apprepo.SavePatientNotes(note, notesfilepath);
             Console.WriteLine("Patient Notes  Added Successfully");
+        }
+        // marks the prescription as false to say that it is no longer valid
+        public void DeactivatePrescription()
+        {
+            var prescriptionfilepath = ConfigurationManager.AppSettings["patientprescriptionsfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            List<Prescription> prescriptions = apprepo.FetchPrescriptions(prescriptionfilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            Console.WriteLine("Enter Medicine to deactivate");
+            string medicine = Console.ReadLine();
+            List<Prescription> prescription = new List<Prescription>();
+            foreach (Prescription app in prescriptions.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.Medicine == medicine).ToList())
+            {
+                prescription.Add(app);
+            }
+            if (prescription.Count == 0)
+            {
+                Console.WriteLine("Please enter valid Patient Hospital number or medicine");
+            }
+            else
+            {
+                foreach (var app in prescription)
+                {
+                    app.Active = false;
+                }
+                apprepo.WritePrescriptionsToCsv(prescriptionfilepath, prescriptions);
+            }
+
+        }
+        // marks the subject in a patients note as false to say that it is no longer needed
+        public void DeactivatePatientNote()
+        {
+            var notefilepath = ConfigurationManager.AppSettings["patientnotesfilepath"];
+            PatientRepository apprepo = new PatientRepository();
+            List<PatientNotes> notes = apprepo.FetchPatientNotes(notefilepath);
+            Console.WriteLine("Enter Patient Hospital Number");
+            string patientnumber = Console.ReadLine();
+            Console.WriteLine("Enter Subject to deactivate");
+            string subject = Console.ReadLine();
+            List<PatientNotes> note = new List<PatientNotes>();
+            foreach (PatientNotes app in notes.Where(u => u.HospitalNumber == patientnumber && u.Active == true && u.Subject == subject).ToList())
+            {
+                note.Add(app);
+            }
+            if (note.Count == 0)
+            {
+                Console.WriteLine("Please enter valid Patient Hospital number or subjet");
+            }
+            else
+            {
+                foreach (var app in note)
+                {
+                    app.Active = false;
+                }
+                apprepo.WritePatientNotesToCsv(notefilepath, notes);
+            }
         }
 
         #endregion

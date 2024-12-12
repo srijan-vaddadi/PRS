@@ -143,7 +143,9 @@ namespace PRS.Repository
                     var note = new PatientNotes
                     {
                         HospitalNumber = values[0],
-                        Notes = values[1]
+                        Notes = values[1],
+                        Subject = values[2],
+                        Active = Convert.ToBoolean(values[3])
                     };
                     notes.Add(note);
                 }
@@ -167,7 +169,7 @@ namespace PRS.Repository
             using (StreamWriter writer = new StreamWriter(filePath))
             {
                 foreach (var prescription in prescriptions)
-                { writer.WriteLine($"{prescription.HospitalNumber},{prescription.Medicine}"); }
+                { writer.WriteLine($"{prescription.HospitalNumber},{prescription.Medicine},{prescription.Dosage},{prescription.Active}"); }
             }
         }
         public void WriteAppointmentsToCsv(string filePath, List<Appointment> appointments)
@@ -186,7 +188,7 @@ namespace PRS.Repository
             {
                 foreach (var note in notes)
                 {
-                    writer.WriteLine($"{note.HospitalNumber},{note.Notes}");
+                    writer.WriteLine($"{note.HospitalNumber},{note.Notes},{note.Subject},{note.Active}");
                 }
             }
         }
@@ -194,3 +196,4 @@ namespace PRS.Repository
         #endregion
     }
 }
+ 

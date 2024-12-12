@@ -8,6 +8,7 @@ namespace PRS
     {
         static void Main()
         {
+            // Asks the user whether they want to choose login, password recovery or exit the program
             Console.WriteLine("Select your choice");
             Console.WriteLine("1. Login");
             Console.WriteLine("2. Password Recovery");
@@ -29,6 +30,6 @@ namespace PRS
                     return;
 
             }
-        }       
+        }
     }
 }
