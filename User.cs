@@ -24,7 +24,10 @@ namespace PRS
                 if(featurename==null)
                 {
                     Console.WriteLine("Option that you selected not in the above list.Please select Valid option.");
-                    return;
+                    Console.WriteLine();
+                    RunFeatures(features, user);
+                    continue;
+                    // return;
                 }
                 Feature onjFeature = new Feature();
                 onjFeature.ExecuteFeature(featurename.FeatureName, user);

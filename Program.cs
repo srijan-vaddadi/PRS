@@ -27,6 +27,7 @@ namespace PRS
                     fea.Exit();
                     break;
                 default:
+                    Console.WriteLine("Invalid Choice");
                     return;
 
             }

@@ -137,6 +137,7 @@ namespace PRS
                     Exit();
                     break;
                 default:
+                    Console.WriteLine("Please select valid choice");
                     return;
 
             }
@@ -432,7 +433,7 @@ namespace PRS
                 Console.WriteLine("User " + usr.Username + " doesn't exist.");
             }
         }
-            public void ChangePassword()
+        public void ChangePassword()
         {
             UserRepository userrepo = new UserRepository();
             var filepath = ConfigurationManager.AppSettings["userfilepath"];
@@ -607,7 +608,7 @@ namespace PRS
             PatientRepository patientrepo = new PatientRepository();
             var filepath = ConfigurationManager.AppSettings["patientbasicfilepath"];
             List<Patients> patients = patientrepo.FetchAllPatients(filepath);
-            Patients patient;
+           // Patients patient;
             Console.WriteLine("Select one of the below options that you want to search");
             Console.WriteLine("1. Firstname");
             Console.WriteLine("2. Surname");
@@ -616,37 +617,40 @@ namespace PRS
             Console.WriteLine("5. Hospital Number");
             Console.WriteLine("6. Phone Number");
             var choice = Console.ReadLine();
+            List<Patients> lstpatient = new List<Patients>();
+    
             switch (choice)
             {
                 case "1":
                     Console.WriteLine("Enter First Name of Patient");
                     string firstname = Console.ReadLine();
-                    patient = patients.Find(u => u.FirstName.ToLower() == firstname.ToLower());
+                    lstpatient = patients.Where(u => u.FirstName.ToLower() == firstname.ToLower()).ToList();
+                                    
                     break;
                 case "2":
                     Console.WriteLine("Enter Surname of Patient");
                     string surname = Console.ReadLine();
-                    patient = patients.Find(u => u.Surname.ToLower() == surname.ToLower());
+                    lstpatient = patients.Where(u => u.Surname.ToLower() == surname.ToLower()).ToList();
                     break;
                 case "3":
                     Console.WriteLine("Enter Date of Birth(MM-DD-YYYY) of Patient");
                     string dob = Console.ReadLine();
-                    patient = patients.Find(u => u.DateOfBirth.ToLower() == dob.ToLower());
+                    lstpatient = patients.Where(u => u.DateOfBirth.ToLower() == dob.ToLower()).ToList();
                     break;
                 case "4":
                     Console.WriteLine("Enter NHS Number of Patient");
                     string nhsnumber = Console.ReadLine();
-                    patient = patients.Find(u => u.NHSNumber.ToLower() == nhsnumber.ToLower());
+                    lstpatient = patients.Where(u => u.NHSNumber.ToLower() == nhsnumber.ToLower()).ToList();
                     break;
                 case "5":
                     Console.WriteLine("Enter Hospital Number of Patient");
                     string hosnumber = Console.ReadLine();
-                    patient = patients.Find(u => u.HospitalNumber.ToLower() == hosnumber.ToLower());
+                    lstpatient = patients.Where(u => u.HospitalNumber.ToLower() == hosnumber.ToLower()).ToList();
                     break;
                 case "6":
                     Console.WriteLine("Enter Phone Number of Patient");
                     string phonenumber = Console.ReadLine();
-                    patient = patients.Find(u => u.PhoneNumber == phonenumber);
+                    lstpatient = patients.Where(u => u.PhoneNumber == phonenumber).ToList();
                     break;
                 default:
                     Console.WriteLine("Please select a valid option");
@@ -654,7 +658,7 @@ namespace PRS
 
             }       
             
-            if (patient == null)
+            if (lstpatient.Count == 0)
             {
                 Console.WriteLine("Patient not found");
             }
@@ -664,7 +668,10 @@ namespace PRS
                 Console.WriteLine();
                 Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", "FirstName", "Surname", "DateOfBirth", "PhoneNumber", "NHSNumber", "HospitalNumber");
                 Console.WriteLine(new string('-', 75));
-                Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber, patient.HospitalNumber);
+                foreach (var patient in lstpatient)
+                {
+                    Console.WriteLine("{0,-10} {1,-10} {2,-10} {3,-15} {4,-15} {5,-15}", patient.FirstName, patient.Surname, patient.DateOfBirth, patient.PhoneNumber, patient.NHSNumber, patient.HospitalNumber);
+                }
             }
         }
         // The function to add an appointment which changes to depending on whether it is called by a doctor or nurse
